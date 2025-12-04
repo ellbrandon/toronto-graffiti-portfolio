@@ -118,11 +118,10 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
             transition: 'background-color 0.3s'
         }}>
             <div>
-                <div style={{ marginBottom: '60px' }}>
+                <div style={{ marginBottom: '40px' }}>
                     <h1 style={{
-                        fontSize: '1.2rem',
+                        fontSize: '1.8rem',
                         fontWeight: 'bold',
-                        lineHeight: '1.4',
                         letterSpacing: '0.05em',
                         marginBottom: '5px'
                     }}>
