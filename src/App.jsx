@@ -18,6 +18,7 @@ const shuffleArray = (array) => {
 function App() {
   const [cursorEffectEnabled, setCursorEffectEnabled] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [colorMode, setColorMode] = useState(false); // false = grayscale default, true = color default
   const [shuffledPhotos, setShuffledPhotos] = useState(() => shuffleArray(photos));
   const [activeFilters, setActiveFilters] = useState({
     location: null,
@@ -75,6 +76,8 @@ function App() {
         onThemeToggle={() => setDarkMode(!darkMode)}
         cursorEffectEnabled={cursorEffectEnabled}
         onCursorToggle={() => setCursorEffectEnabled(!cursorEffectEnabled)}
+        colorMode={colorMode}
+        onColorModeToggle={() => setColorMode(!colorMode)}
         onShuffle={handleShuffle}
       />
 
@@ -90,6 +93,7 @@ function App() {
         <PhotoGrid
           photos={filteredPhotos}
           onPhotoClick={setSelectedPhoto}
+          colorMode={colorMode}
         />
       </main>
 

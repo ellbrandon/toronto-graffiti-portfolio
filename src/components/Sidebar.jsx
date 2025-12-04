@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, Dices } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, Dices, Palette } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
     const [page, setPage] = useState(0);
@@ -100,7 +100,7 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
     );
 };
 
-const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, onShuffle }) => {
+const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
     return (
         <aside style={{
             width: '250px',
@@ -266,6 +266,26 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                         title="Shuffle & Clear Filters"
                     >
                         <Dices size={20} />
+                    </button>
+
+                    {/* Color Mode Toggle */}
+                    <button
+                        onClick={onColorModeToggle}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: 0,
+                            transition: 'transform 0.2s, color 0.3s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                        title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
+                    >
+                        <Palette size={20} />
                     </button>
                 </div>
 
