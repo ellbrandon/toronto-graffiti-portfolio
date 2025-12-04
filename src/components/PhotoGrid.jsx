@@ -125,18 +125,18 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
         .img-wrapper:hover .overlay {
           opacity: 1;
         }
-        
+
         @media (max-width: 1024px) {
           .grid-sizer,
           .grid-item {
             width: calc(50% - 10px) !important;
           }
         }
-        
-        @media (max-width: 600px) {
+
+        @media (max-width: 768px) {
           .grid-sizer,
           .grid-item {
-            width: 100% !important;
+            width: calc(50% - 10px) !important;
           }
         }
       `}</style>

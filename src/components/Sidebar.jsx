@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, Dices, Palette } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, Dices, Palette, Menu, X, ChevronDown } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
     const [page, setPage] = useState(0);
@@ -100,204 +100,490 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
     );
 };
 
-const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
+const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <aside style={{
-            width: '250px',
-            height: '100vh',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            backgroundColor: darkMode ? 'var(--bg-color)' : '#ffffff',
-            zIndex: 100,
-            overflowY: 'auto',
-            transition: 'background-color 0.3s'
-        }}>
-            <div>
-                <div style={{ marginBottom: '40px' }}>
-                    <h1 style={{
-                        fontSize: '1.8rem',
-                        fontWeight: 'bold',
-                        letterSpacing: '0.05em',
-                        marginBottom: '5px'
-                    }}>
-                        TORONTO<br />GRAFFITI
-                    </h1>
-                    <p style={{
-                        fontSize: '0.7rem',
-                        color: 'var(--hover-color)',
-                        letterSpacing: '0.1em'
-                    }}>
-                        ARCHIVE 2010-2025
-                    </p>
+        <div style={{ position: 'relative', flex: 1 }}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                    border: 'none',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                }}
+            >
+                <span>{activeItem || title}</span>
+                <ChevronDown size={14} style={{
+                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s'
+                }} />
+            </button>
+
+            {isOpen && (
+                <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    marginTop: '4px',
+                    backgroundColor: darkMode ? 'var(--bg-color)' : '#ffffff',
+                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                    borderRadius: '4px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                }}>
+                    <button
+                        onClick={() => {
+                            onItemClick(null);
+                            setIsOpen(false);
+                        }}
+                        style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            border: 'none',
+                            background: 'none',
+                            textAlign: 'left',
+                            fontSize: '0.8rem',
+                            color: !activeItem ? (darkMode ? 'var(--text-color)' : 'var(--text-color-dark)') : 'var(--hover-color)',
+                            fontWeight: !activeItem ? 'bold' : 'normal',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                        All
+                    </button>
+                    {items.map(item => (
+                        <button
+                            key={item}
+                            onClick={() => {
+                                onItemClick(item);
+                                setIsOpen(false);
+                            }}
+                            style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                background: 'none',
+                                textAlign: 'left',
+                                fontSize: '0.8rem',
+                                color: activeItem === item ? (darkMode ? 'var(--text-color)' : 'var(--text-color-dark)') : 'var(--hover-color)',
+                                fontWeight: activeItem === item ? 'bold' : 'normal',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                            {item}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    return (
+        <>
+            {/* Desktop Sidebar */}
+            <aside className="desktop-sidebar" style={{
+                width: '250px',
+                height: '100vh',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                padding: '40px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                backgroundColor: darkMode ? 'var(--bg-color)' : '#ffffff',
+                zIndex: 100,
+                overflowY: 'auto',
+                transition: 'background-color 0.3s'
+            }}>
+                <div>
+                    <button
+                        onClick={() => {
+                            onFilterChange('style', null);
+                            onFilterChange('location', null);
+                            onFilterChange('author', null);
+                        }}
+                        style={{
+                            marginBottom: '40px',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            width: '100%'
+                        }}
+                    >
+                        <h1 style={{
+                            fontSize: '1.8rem',
+                            fontWeight: 'bold',
+                            letterSpacing: '0.05em',
+                            marginBottom: '5px'
+                        }}>
+                            TORONTO<br />GRAFFITI
+                        </h1>
+                        <p style={{
+                            fontSize: '0.7rem',
+                            color: 'var(--hover-color)',
+                            letterSpacing: '0.2em'
+                        }}>
+                            ARCHIVE 2010-2025
+                        </p>
+                    </button>
+
+                    <nav>
+                        <FilterSection
+                            title="Styles"
+                            items={filters.styles}
+                            activeItem={activeFilters.style}
+                            onItemClick={(val) => onFilterChange('style', val)}
+                            itemsPerPage={4}
+                            darkMode={darkMode}
+                        />
+
+                        <FilterSection
+                            title="Locations"
+                            items={filters.locations}
+                            activeItem={activeFilters.location}
+                            onItemClick={(val) => onFilterChange('location', val)}
+                            itemsPerPage={4}
+                            darkMode={darkMode}
+                        />
+
+                        <FilterSection
+                            title="Artists"
+                            items={filters.authors}
+                            activeItem={activeFilters.author}
+                            onItemClick={(val) => onFilterChange('author', val)}
+                            itemsPerPage={4}
+                            darkMode={darkMode}
+                        />
+
+                        <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <button style={{
+                                fontSize: '0.9rem',
+                                color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
+                                textAlign: 'left',
+                                transition: 'color 0.3s'
+                            }}>
+                                About
+                            </button>
+                            <button style={{
+                                fontSize: '0.9rem',
+                                color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
+                                textAlign: 'left',
+                                transition: 'color 0.3s'
+                            }}>
+                                Contact
+                            </button>
+                        </div>
+                    </nav>
                 </div>
 
-                <nav>
-                    <FilterSection
+                <div style={{ marginTop: '40px' }}>
+                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
+                        {/* Instagram Button */}
+                        <button
+                            onClick={() => window.open('https://www.instagram.com/flown_canary', '_blank')}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title="Follow on Instagram"
+                        >
+                            <Instagram size={20} />
+                        </button>
+
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={onThemeToggle}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        >
+                            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+
+                        {/* Cursor Effect Toggle */}
+                        <button
+                            onClick={onCursorToggle}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: cursorEffectEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s, color 0.3s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title={cursorEffectEnabled ? 'Disable Spray Effect' : 'Enable Spray Effect'}
+                        >
+                            <Sparkles size={20} />
+                        </button>
+
+                        {/* Shuffle Button */}
+                        <button
+                            onClick={onShuffle}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'rotate(180deg) scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'rotate(0deg) scale(1)'}
+                            title="Shuffle & Clear Filters"
+                        >
+                            <Dices size={20} />
+                        </button>
+
+                        {/* Color Mode Toggle */}
+                        <button
+                            onClick={onColorModeToggle}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s, color 0.3s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
+                        >
+                            <Palette size={20} />
+                        </button>
+                    </div>
+
+                    <p style={{
+                        fontSize: '0.6rem',
+                        color: darkMode ? 'var(--grey)' : 'var(--dark-grey)',
+                        lineHeight: '1.5'
+                    }}>
+                        &copy; {new Date().getFullYear()}<br />
+                        ALL RIGHTS RESERVED
+                    </p>
+                </div>
+            </aside>
+
+            {/* Mobile Header */}
+            <header className="mobile-header" style={{
+                display: 'none',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: darkMode ? 'var(--bg-color)' : '#ffffff',
+                borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                padding: '12px 16px',
+                zIndex: 200,
+                transition: 'background-color 0.3s'
+            }}>
+                {/* Top row: Logo and Menu */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <button
+                        onClick={() => {
+                            onFilterChange('style', null);
+                            onFilterChange('location', null);
+                            onFilterChange('author', null);
+                        }}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            textAlign: 'left'
+                        }}
+                    >
+                        <h1 style={{
+                            fontSize: '1.2rem',
+                            fontWeight: 'bold',
+                            letterSpacing: '0.05em',
+                            margin: 0
+                        }}>
+                            TORONTO GRAFFITI
+                        </h1>
+                    </button>
+
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: darkMode ? 'var(--text-color)' : '#000',
+                            padding: 0,
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+
+                {/* Filter dropdowns */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                    <MobileDropdown
                         title="Styles"
                         items={filters.styles}
                         activeItem={activeFilters.style}
                         onItemClick={(val) => onFilterChange('style', val)}
-                        itemsPerPage={4}
                         darkMode={darkMode}
                     />
-
-                    <FilterSection
+                    <MobileDropdown
                         title="Locations"
                         items={filters.locations}
                         activeItem={activeFilters.location}
                         onItemClick={(val) => onFilterChange('location', val)}
-                        itemsPerPage={4}
                         darkMode={darkMode}
                     />
-
-                    <FilterSection
+                    <MobileDropdown
                         title="Artists"
                         items={filters.authors}
                         activeItem={activeFilters.author}
                         onItemClick={(val) => onFilterChange('author', val)}
-                        itemsPerPage={4}
                         darkMode={darkMode}
                     />
+                </div>
 
-                    <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        <button style={{
-                            fontSize: '0.9rem',
-                            color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                            textAlign: 'left',
-                            transition: 'color 0.3s'
-                        }}>
-                            About
+                {/* Control buttons - visible when menu open */}
+                {mobileMenuOpen && (
+                    <div style={{
+                        display: 'flex',
+                        gap: '15px',
+                        alignItems: 'center',
+                        paddingTop: '12px',
+                        borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
+                    }}>
+                        <button
+                            onClick={() => window.open('https://www.instagram.com/flown_canary', '_blank')}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0
+                            }}
+                        >
+                            <Instagram size={20} />
                         </button>
-                        <button style={{
-                            fontSize: '0.9rem',
-                            color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                            textAlign: 'left',
-                            transition: 'color 0.3s'
-                        }}>
-                            Contact
-                        </button>
-                    </div>
-                </nav>
-            </div>
-
-            <div style={{ marginTop: '40px' }}>
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
-                    {/* Instagram Button */}
-                    <button
-                        onClick={() => window.open('https://www.instagram.com/flown_canary', '_blank')}
-                        style={{
+                        <button onClick={onThemeToggle} style={{
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             color: darkMode ? 'var(--text-color)' : '#000',
                             display: 'flex',
                             alignItems: 'center',
-                            padding: 0,
-                            transition: 'transform 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        title="Follow on Instagram"
-                    >
-                        <Instagram size={20} />
-                    </button>
-
-                    {/* Theme Toggle */}
-                    <button
-                        onClick={onThemeToggle}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: darkMode ? 'var(--text-color)' : '#000',
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: 0,
-                            transition: 'transform 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                    >
-                        {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                    </button>
-
-                    {/* Cursor Effect Toggle */}
-                    <button
-                        onClick={onCursorToggle}
-                        style={{
+                            padding: 0
+                        }}>
+                            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+                        <button onClick={onCursorToggle} style={{
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             color: cursorEffectEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
                             display: 'flex',
                             alignItems: 'center',
-                            padding: 0,
-                            transition: 'transform 0.2s, color 0.3s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        title={cursorEffectEnabled ? 'Disable Spray Effect' : 'Enable Spray Effect'}
-                    >
-                        <Sparkles size={20} />
-                    </button>
-
-                    {/* Shuffle Button */}
-                    <button
-                        onClick={onShuffle}
-                        style={{
+                            padding: 0
+                        }}>
+                            <Sparkles size={20} />
+                        </button>
+                        <button onClick={onShuffle} style={{
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             color: darkMode ? 'var(--text-color)' : '#000',
                             display: 'flex',
                             alignItems: 'center',
-                            padding: 0,
-                            transition: 'transform 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'rotate(180deg) scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'rotate(0deg) scale(1)'}
-                        title="Shuffle & Clear Filters"
-                    >
-                        <Dices size={20} />
-                    </button>
-
-                    {/* Color Mode Toggle */}
-                    <button
-                        onClick={onColorModeToggle}
-                        style={{
+                            padding: 0
+                        }}>
+                            <Dices size={20} />
+                        </button>
+                        <button onClick={onColorModeToggle} style={{
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
                             display: 'flex',
                             alignItems: 'center',
-                            padding: 0,
-                            transition: 'transform 0.2s, color 0.3s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
-                    >
-                        <Palette size={20} />
-                    </button>
-                </div>
+                            padding: 0
+                        }}>
+                            <Palette size={20} />
+                        </button>
+                    </div>
+                )}
+            </header>
 
-                <p style={{
-                    fontSize: '0.6rem',
-                    color: darkMode ? 'var(--grey)' : 'var(--dark-grey)',
-                    lineHeight: '1.5'
-                }}>
-                    &copy; {new Date().getFullYear()}<br />
-                    ALL RIGHTS RESERVED
-                </p>
-            </div>
-        </aside>
+            {/* Add responsive styles */}
+            <style>{`
+                @media (max-width: 768px) {
+                    .desktop-sidebar {
+                        display: none !important;
+                    }
+                    .mobile-header {
+                        display: block !important;
+                    }
+                }
+                @media (min-width: 769px) {
+                    .mobile-header {
+                        display: none !important;
+                    }
+                }
+            `}</style>
+        </>
     );
 };
 

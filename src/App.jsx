@@ -81,7 +81,7 @@ function App() {
         onShuffle={handleShuffle}
       />
 
-      <main style={{
+      <main className="main-content" style={{
         marginLeft: '250px',
         width: 'calc(100% - 250px)',
         height: '100vh',
@@ -103,6 +103,16 @@ function App() {
       />
 
       {cursorEffectEnabled && <CursorEffect />}
+
+      <style>{`
+        @media (max-width: 768px) {
+          .main-content {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding-top: 160px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
