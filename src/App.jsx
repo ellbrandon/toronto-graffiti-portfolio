@@ -2,9 +2,11 @@ import React, { useState, useMemo } from 'react';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import PhotoModal from './components/PhotoModal';
+import CursorEffect from './components/CursorEffect';
 import { photos } from './data/photos';
 
 function App() {
+  const [cursorEffectEnabled, setCursorEffectEnabled] = useState(false); // Set to false by default
   const [activeFilters, setActiveFilters] = useState({
     location: null,
     style: null,
@@ -62,6 +64,8 @@ function App() {
         photo={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
       />
+
+      {cursorEffectEnabled && <CursorEffect />}
     </div>
   );
 }

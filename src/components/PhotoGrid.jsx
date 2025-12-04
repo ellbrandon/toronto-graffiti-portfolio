@@ -74,15 +74,18 @@ const PhotoGrid = ({ photos, onPhotoClick }) => {
                                     width: '100%',
                                     display: 'block',
                                     filter: 'grayscale(100%) contrast(110%)',
-                                    transition: 'all 0.5s ease'
+                                    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    transformOrigin: 'center'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.filter = 'grayscale(0%) contrast(100%)';
-                                    e.currentTarget.style.transform = 'scale(1.02)';
+                                    e.currentTarget.style.filter = 'grayscale(0%) contrast(100%) brightness(1.1)';
+                                    e.currentTarget.style.transform = 'scale(1.05)';
+                                    e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 255, 255, 0.3)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.filter = 'grayscale(100%) contrast(110%)';
                                     e.currentTarget.style.transform = 'scale(1)';
+                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                             />
                             <div className="overlay" style={{
