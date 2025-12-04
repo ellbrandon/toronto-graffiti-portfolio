@@ -1,26 +1,68 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Masonry from 'masonry-layout';
+import imagesLoaded from 'imagesloaded';
 
 const PhotoGrid = ({ photos, onPhotoClick }) => {
+    const gridRef = useRef(null);
+    const masonryRef = useRef(null);
+    const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+        if (!gridRef.current) return;
+
+        // Initialize Masonry
+        masonryRef.current = new Masonry(gridRef.current, {
+            itemSelector: '.grid-item',
+            columnWidth: '.grid-sizer',
+            percentPosition: true,
+            gutter: 20,
+            transitionDuration: 0 // Disable animation on initial layout
+        });
+
+        // Wait for all images to load before showing
+        const imgLoad = imagesLoaded(gridRef.current);
+
+        imgLoad.on('progress', () => {
+            masonryRef.current.layout();
+        });
+
+        imgLoad.on('done', () => {
+            masonryRef.current.layout();
+            // Small delay to ensure layout is completely stable
+            setTimeout(() => {
+                setIsReady(true);
+            }, 100);
+        });
+
+        return () => {
+            if (masonryRef.current) {
+                masonryRef.current.destroy();
+            }
+        };
+    }, [photos]);
+
     return (
         <div className="container" style={{ paddingBottom: '100px' }}>
-            <div style={{
-                columnCount: 3,
-                columnGap: '20px',
-                // Responsive column count handled via media queries in CSS if needed, 
-                // but inline styles are tricky for media queries. 
-                // We'll add a class for responsiveness in index.css later.
-            }} className="masonry-grid">
+            <div
+                ref={gridRef}
+                style={{
+                    opacity: isReady ? 1 : 0,
+                    transition: 'opacity 0.5s ease-in'
+                }}
+            >
+                {/* Grid sizer for column width */}
+                <div className="grid-sizer" style={{ width: 'calc(33.333% - 14px)' }}></div>
+
                 {photos.map((photo, index) => (
                     <div
                         key={photo.id}
-                        className="fade-in"
+                        className="grid-item"
                         style={{
-                            breakInside: 'avoid',
+                            width: 'calc(33.333% - 14px)',
                             marginBottom: '20px',
                             cursor: 'zoom-in',
                             position: 'relative',
-                            overflow: 'hidden',
-                            animationDelay: `${index * 0.05}s` // Staggered animation
+                            overflow: 'hidden'
                         }}
                         onClick={() => onPhotoClick(photo)}
                     >
@@ -61,15 +103,24 @@ const PhotoGrid = ({ photos, onPhotoClick }) => {
                     </div>
                 ))}
             </div>
+
             <style>{`
         .img-wrapper:hover .overlay {
           opacity: 1;
         }
+        
         @media (max-width: 1024px) {
-          .masonry-grid { column-count: 2 !important; }
+          .grid-sizer,
+          .grid-item {
+            width: calc(50% - 10px) !important;
+          }
         }
+        
         @media (max-width: 600px) {
-          .masonry-grid { column-count: 1 !important; }
+          .grid-sizer,
+          .grid-item {
+            width: 100% !important;
+          }
         }
       `}</style>
         </div>
