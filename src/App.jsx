@@ -48,7 +48,8 @@ function App() {
       <main style={{
         marginLeft: '250px',
         width: 'calc(100% - 250px)',
-        minHeight: '100vh',
+        height: '100vh',
+        overflowY: 'auto',
         paddingTop: '40px'
       }}>
         <PhotoGrid

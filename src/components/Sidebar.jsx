@@ -20,7 +20,7 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
             }}>
                 <h3 style={{
                     fontSize: '0.7rem',
-                    color: 'var(--accent-color)',
+                    color: 'var(--light-grey)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em'
                 }}>
