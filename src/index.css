@@ -1,9 +1,12 @@
 :root {
   --bg-color: #000000;
   --text-color: #ffffff;
+  --text-color-dark: #000000;
   --accent-color: #333333;
   --hover-color: #555555;
-  --light-grey: lightgrey;
+  --dark-grey: #333333;
+  --grey: #9a9a9a;
+  --light-grey: #cdcdcd;
   --font-main: 'Inter', sans-serif;
   --transition-speed: 0.3s;
   --grid-gap: 20px;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const CursorEffect = () => {
     const [particles, setParticles] = useState([]);
+    const rainbowColors = ['#ff0080', '#ff8c00', '#ffff00', '#00ff00', '#00ffff', '#0080ff', '#8000ff'];
 
     useEffect(() => {
         let particleId = 0;
@@ -17,7 +18,8 @@ const CursorEffect = () => {
                     size: Math.random() * 4 + 2,
                     speedX: (Math.random() - 0.5) * 2,
                     speedY: Math.random() * 2 + 1,
-                    life: 1
+                    life: 1,
+                    color: rainbowColors[Math.floor(Math.random() * rainbowColors.length)]
                 });
             }
 
@@ -69,11 +71,11 @@ const CursorEffect = () => {
                             top: particle.y,
                             width: particle.size,
                             height: particle.size,
-                            backgroundColor: '#fff',
+                            backgroundColor: particle.color,
                             borderRadius: '50%',
                             opacity: particle.life,
                             transform: 'translate(-50%, -50%)',
-                            boxShadow: `0 0 ${particle.size * 2}px rgba(255, 255, 255, ${particle.life * 0.5})`
+                            boxShadow: `0 0 ${particle.size * 3}px ${particle.color}`
                         }}
                     />
                 ))}
