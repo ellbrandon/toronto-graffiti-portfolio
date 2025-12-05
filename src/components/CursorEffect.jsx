@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 const CursorEffect = () => {
     const [particles, setParticles] = useState([]);
+    const particlesRef = useRef([]);
+    const particleIdRef = useRef(0);
     const rainbowColors = ['#ff0080', '#ff8c00', '#ffff00', '#00ff00', '#00ffff', '#0080ff', '#8000ff'];
 
     useEffect(() => {
-        let particleId = 0;
+        let animationFrameId;
+        let lastTime = performance.now();
 
         const handleMouseMove = (e) => {
-            // Create multiple particles per movement
+            // Create particles
             const newParticles = [];
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 2; i++) { // Reduced from 3 to 2
                 newParticles.push({
-                    id: particleId++,
+                    id: particleIdRef.current++,
                     x: e.clientX + (Math.random() - 0.5) * 10,
                     y: e.clientY + (Math.random() - 0.5) * 10,
                     size: Math.random() * 4 + 2,
@@ -23,28 +26,50 @@ const CursorEffect = () => {
                 });
             }
 
-            setParticles(prev => [...prev, ...newParticles].slice(-50)); // Keep last 50 particles
+            particlesRef.current = [...particlesRef.current, ...newParticles].slice(-40); // Reduced from 50 to 40
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
+        // Throttle mousemove events
+        let throttleTimeout;
+        const throttledMouseMove = (e) => {
+            if (!throttleTimeout) {
+                throttleTimeout = setTimeout(() => {
+                    handleMouseMove(e);
+                    throttleTimeout = null;
+                }, 16); // ~60fps
+            }
+        };
 
-        // Animate particles
-        const interval = setInterval(() => {
-            setParticles(prev =>
-                prev
+        window.addEventListener('mousemove', throttledMouseMove);
+
+        // Animate particles using RAF
+        const animate = (currentTime) => {
+            const deltaTime = currentTime - lastTime;
+
+            if (deltaTime >= 32) { // Update at ~30fps instead of 60fps
+                lastTime = currentTime;
+
+                particlesRef.current = particlesRef.current
                     .map(p => ({
                         ...p,
                         y: p.y + p.speedY,
                         x: p.x + p.speedX,
                         life: p.life - 0.02
                     }))
-                    .filter(p => p.life > 0)
-            );
-        }, 16);
+                    .filter(p => p.life > 0);
+
+                setParticles([...particlesRef.current]);
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        };
+
+        animationFrameId = requestAnimationFrame(animate);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            clearInterval(interval);
+            window.removeEventListener('mousemove', throttledMouseMove);
+            cancelAnimationFrame(animationFrameId);
+            if (throttleTimeout) clearTimeout(throttleTimeout);
         };
     }, []);
 

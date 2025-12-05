@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Masonry from 'masonry-layout';
 import imagesLoaded from 'imagesloaded';
 
@@ -83,36 +83,13 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
                             <img
                                 src={photo.url}
                                 alt={`${photo.style} at ${photo.location}`}
+                                className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
+                                loading="lazy"
+                                decoding="async"
                                 style={{
                                     width: '100%',
                                     display: 'block',
-                                    filter: colorMode
-                                        ? 'grayscale(0%) contrast(100%)'
-                                        : 'grayscale(100%) contrast(110%)',
-                                    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
                                     transformOrigin: 'center'
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (colorMode) {
-                                        // Color default: hover to grayscale
-                                        e.currentTarget.style.filter = 'grayscale(100%) contrast(110%)';
-                                    } else {
-                                        // Grayscale default: hover to color
-                                        e.currentTarget.style.filter = 'grayscale(0%) contrast(100%) brightness(1.1)';
-                                    }
-                                    e.currentTarget.style.transform = 'scale(1.05)';
-                                    e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 255, 255, 0.3)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (colorMode) {
-                                        // Return to color
-                                        e.currentTarget.style.filter = 'grayscale(0%) contrast(100%)';
-                                    } else {
-                                        // Return to grayscale
-                                        e.currentTarget.style.filter = 'grayscale(100%) contrast(110%)';
-                                    }
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                             />
                             <div className="overlay" style={{
@@ -135,6 +112,36 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
             </div>
 
             <style>{`
+        /* Image fade-in effect */
+        .photo-img {
+          opacity: 1;
+          filter: grayscale(100%) contrast(110%);
+          transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform;
+        }
+
+        /* Grayscale mode (default) */
+        .grayscale-mode {
+          filter: grayscale(100%) contrast(110%);
+        }
+
+        .grayscale-mode:hover {
+          filter: grayscale(0%) contrast(100%) brightness(1.1);
+          transform: scale(1.05);
+          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Color mode */
+        .color-mode {
+          filter: grayscale(0%) contrast(100%);
+        }
+
+        .color-mode:hover {
+          filter: grayscale(100%) contrast(110%);
+          transform: scale(1.05);
+          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
         .img-wrapper:hover .overlay {
           opacity: 1;
         }

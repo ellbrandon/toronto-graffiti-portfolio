@@ -32,7 +32,7 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
                     <div style={{
                         display: 'flex',
                         gap: '10px',
-                        color: 'var(--light-grey)'
+                        color: 'var(--grey)'
                     }}>
                         <button
                             onClick={() => setPage(p => Math.max(0, p - 1))}
