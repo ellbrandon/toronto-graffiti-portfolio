@@ -24,11 +24,36 @@ const shuffleArray = (array) => {
   return shuffled;
 };
 
+const getInitialState = (key, defaultValue) => {
+  const saved = localStorage.getItem(key);
+  if (saved !== null) {
+    return JSON.parse(saved);
+  }
+  return defaultValue;
+};
+
 function App() {
-  const [magicCursorEnabled, setMagicCursorEnabled] = useState(true);
-  const [cursorEffectEnabled, setCursorEffectEnabled] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
-  const [colorMode, setColorMode] = useState(false); // false = grayscale default, true = color default
+  const [magicCursorEnabled, setMagicCursorEnabled] = useState(() => getInitialState('magicCursorEnabled', true));
+  const [cursorEffectEnabled, setCursorEffectEnabled] = useState(() => getInitialState('cursorEffectEnabled', false));
+  const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
+  const [colorMode, setColorMode] = useState(() => getInitialState('colorMode', false)); // false = grayscale default, true = color default
+
+  // Persist settings
+  useEffect(() => {
+    localStorage.setItem('magicCursorEnabled', JSON.stringify(magicCursorEnabled));
+  }, [magicCursorEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('cursorEffectEnabled', JSON.stringify(cursorEffectEnabled));
+  }, [cursorEffectEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('colorMode', JSON.stringify(colorMode));
+  }, [colorMode]);
   const [shuffledPhotos, setShuffledPhotos] = useState(() => shuffleArray(photos));
   const [activeFilters, setActiveFilters] = useState({
     location: null,
