@@ -85,7 +85,7 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
                         style={{
                             width: 'calc(33.333% - 14px)',
                             marginBottom: '20px',
-                            cursor: 'zoom-in',
+                            cursor: 'none', // Managed by MagicCursor
                             position: 'relative',
                             overflow: 'hidden'
                         }}

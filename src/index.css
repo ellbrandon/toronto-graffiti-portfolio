@@ -25,6 +25,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  cursor: none;
+  /* Hide default cursor for Magic Mouse effect */
+}
+
+/* Ensure custom cursor doesn't interfere with inputs but they still show text beam if needed */
+input,
+textarea {
+  cursor: text;
+}
+
+a,
+button,
+.grid-item {
+  cursor: none;
+  /* Enforce no cursor on interactive elements */
 }
 
 a {

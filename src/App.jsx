@@ -3,10 +3,16 @@ import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import PhotoModal from './components/PhotoModal';
 import CursorEffect from './components/CursorEffect';
+import MagicCursor from './components/MagicCursor';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { photos } from './data/photos';
+
+// Feature Flags
+const ENABLE_MAGIC_CURSOR = true;
+const MAGIC_CURSOR_SIZE_DEFAULT = 25; // Default size in pixels
+const MAGIC_CURSOR_SIZE_HOVER = 50;   // Zoomed size in pixels
 
 // Shuffle function
 const shuffleArray = (array) => {
@@ -120,6 +126,13 @@ function App() {
         />
 
         {cursorEffectEnabled && <CursorEffect />}
+        {ENABLE_MAGIC_CURSOR && (
+          <MagicCursor
+            darkMode={darkMode}
+            outerSize={MAGIC_CURSOR_SIZE_DEFAULT}
+            hoverScale={MAGIC_CURSOR_SIZE_HOVER / MAGIC_CURSOR_SIZE_DEFAULT}
+          />
+        )}
 
         <style>{`
           @media (max-width: 768px) {
