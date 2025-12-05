@@ -17,30 +17,42 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
                 columnWidth: '.grid-sizer',
                 percentPosition: true,
                 gutter: 20,
-                transitionDuration: 0
+                transitionDuration: 0 // Disable animation for performance/sync
             });
         }
 
-        // Wait for images to load
+        // 1. Tell Masonry about new DOM elements immediately
+        masonryRef.current.reloadItems();
+        masonryRef.current.layout();
+
+        // 2. Monitor image loading within the grid
         const imgLoad = imagesLoaded(gridRef.current);
 
+        // Fix: Only call layout() on progress, not reloadItems()
         imgLoad.on('progress', () => {
             if (masonryRef.current) {
-                masonryRef.current.reloadItems();
                 masonryRef.current.layout();
             }
         });
 
-        imgLoad.on('done', () => {
+        imgLoad.on('always', () => {
             if (masonryRef.current) {
-                masonryRef.current.reloadItems();
+                masonryRef.current.layout();
+                setIsReady(true);
+            }
+        });
+
+        // 3. Safety timeout for edge cases (cached images, slow render)
+        const timeoutId = setTimeout(() => {
+            if (masonryRef.current) {
                 masonryRef.current.layout();
             }
-            setIsReady(true);
-        });
+        }, 500);
 
         return () => {
-            // Don't destroy masonry, just let it persist
+            imgLoad.off('progress');
+            imgLoad.off('always');
+            clearTimeout(timeoutId);
         };
     }, [photos]);
 
