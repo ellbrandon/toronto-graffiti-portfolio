@@ -103,3 +103,22 @@ h1 {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--hover-color);
 }
+
+/* Image Filters */
+.img-grayscale {
+  filter: grayscale(100%) contrast(110%);
+  transition: all 0.5s ease;
+}
+
+.img-grayscale:hover {
+  filter: grayscale(0%) contrast(100%);
+}
+
+.img-color {
+  filter: grayscale(0%) contrast(100%);
+  transition: all 0.5s ease;
+}
+
+.img-color:hover {
+  filter: grayscale(100%) contrast(110%);
+}

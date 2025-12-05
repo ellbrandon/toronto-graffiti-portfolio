@@ -3,6 +3,9 @@ import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import PhotoModal from './components/PhotoModal';
 import CursorEffect from './components/CursorEffect';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { photos } from './data/photos';
 
 // Shuffle function
@@ -62,60 +65,73 @@ function App() {
   };
 
   return (
-    <div className="app" style={{
-      display: 'flex',
-      backgroundColor: darkMode ? '#000000' : '#ffffff',
-      color: darkMode ? '#ffffff' : '#000000',
-      transition: 'background-color 0.3s, color 0.3s'
-    }}>
-      <Sidebar
-        filters={filters}
-        activeFilters={activeFilters}
-        onFilterChange={handleFilterChange}
-        darkMode={darkMode}
-        onThemeToggle={() => setDarkMode(!darkMode)}
-        cursorEffectEnabled={cursorEffectEnabled}
-        onCursorToggle={() => setCursorEffectEnabled(!cursorEffectEnabled)}
-        colorMode={colorMode}
-        onColorModeToggle={() => setColorMode(!colorMode)}
-        onShuffle={handleShuffle}
-      />
-
-      <main className="main-content" style={{
-        marginLeft: '250px',
-        width: 'calc(100% - 250px)',
-        height: '100vh',
-        overflowY: 'auto',
-        paddingTop: '40px',
+    <Router>
+      <div className="app" style={{
+        display: 'flex',
         backgroundColor: darkMode ? '#000000' : '#ffffff',
-        transition: 'background-color 0.3s'
+        color: darkMode ? '#ffffff' : '#000000',
+        transition: 'background-color 0.3s, color 0.3s'
       }}>
-        <PhotoGrid
-          photos={filteredPhotos}
-          onPhotoClick={setSelectedPhoto}
+        <Sidebar
+          filters={filters}
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+          darkMode={darkMode}
+          onThemeToggle={() => setDarkMode(!darkMode)}
+          cursorEffectEnabled={cursorEffectEnabled}
+          onCursorToggle={() => setCursorEffectEnabled(!cursorEffectEnabled)}
           colorMode={colorMode}
+          onColorModeToggle={() => setColorMode(!colorMode)}
+          onShuffle={handleShuffle}
         />
-      </main>
 
-      <PhotoModal
-        photo={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
-        photos={filteredPhotos}
-        onNavigate={setSelectedPhoto}
-      />
+        <main className="main-content" style={{
+          marginLeft: '250px',
+          width: 'calc(100% - 250px)',
+          height: '100vh',
+          overflowY: 'auto',
+          // paddingTop: '40px', // Removed padding here, manage in components or routes if needed, specifically About needs full height
+          paddingTop: '0',
+          backgroundColor: darkMode ? '#000000' : '#ffffff',
+          transition: 'background-color 0.3s'
+        }}>
+          <div style={{ paddingTop: '40px' }}> {/* Wrap potentially scrolling content like PhotoGrid if needed, or just apply padding to PhotoGrid container */}
+            <Routes>
+              <Route path="/" element={
+                <div style={{ paddingTop: '40px' }}>
+                  <PhotoGrid
+                    photos={filteredPhotos}
+                    onPhotoClick={setSelectedPhoto}
+                    colorMode={colorMode}
+                  />
+                </div>
+              } />
+              <Route path="/about" element={<About darkMode={darkMode} colorMode={colorMode} />} />
+              <Route path="/contact" element={<Contact darkMode={darkMode} colorMode={colorMode} />} />
+            </Routes>
+          </div>
+        </main>
 
-      {cursorEffectEnabled && <CursorEffect />}
+        <PhotoModal
+          photo={selectedPhoto}
+          onClose={() => setSelectedPhoto(null)}
+          photos={filteredPhotos}
+          onNavigate={setSelectedPhoto}
+        />
 
-      <style>{`
-        @media (max-width: 768px) {
-          .main-content {
-            margin-left: 0 !important;
-            width: 100% !important;
-            padding-top: 160px !important;
+        {cursorEffectEnabled && <CursorEffect />}
+
+        <style>{`
+          @media (max-width: 768px) {
+            .main-content {
+              margin-left: 0 !important;
+              width: 100% !important;
+              padding-top: 50px !important; /* Adjusted for mobile header */
+            }
           }
-        }
-      `}</style>
-    </div>
+        `}</style>
+      </div>
+    </Router>
   );
 }
 

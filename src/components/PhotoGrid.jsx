@@ -84,8 +84,8 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
                                 src={photo.url}
                                 alt={`${photo.style} at ${photo.location}`}
                                 className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
-                                loading="lazy"
-                                decoding="async"
+                                // loading="lazy"
+                                // decoding="async"
                                 style={{
                                     width: '100%',
                                     display: 'block',

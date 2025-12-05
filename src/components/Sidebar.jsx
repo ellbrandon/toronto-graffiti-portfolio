@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
@@ -220,7 +221,8 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 transition: 'background-color 0.3s'
             }}>
                 <div>
-                    <button
+                    <Link
+                        to="/"
                         onClick={() => {
                             onFilterChange('style', null);
                             onFilterChange('location', null);
@@ -233,7 +235,10 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             padding: 0,
                             cursor: 'pointer',
                             textAlign: 'left',
-                            width: '100%'
+                            width: '100%',
+                            display: 'block',
+                            textDecoration: 'none',
+                            color: darkMode ? 'var(--text-color)' : '#000'
                         }}
                     >
                         <h1 style={{
@@ -251,7 +256,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                         }}>
                             ARCHIVE 2010-2025
                         </p>
-                    </button>
+                    </Link>
 
                     <nav>
                         <FilterSection
@@ -282,26 +287,34 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                         />
 
                         <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <button style={{
+                            <Link to="/about" style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
                                 textAlign: 'left',
-                                transition: 'color 0.3s'
+                                transition: 'color 0.3s',
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                textDecoration: 'none'
                             }}>
                                 About
-                            </button>
+                            </Link>
                             <span style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--grey)' : 'var(--dark-grey)'
                             }}>/</span>
-                            <button style={{
+                            <Link to="/contact" style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
                                 textAlign: 'left',
-                                transition: 'color 0.3s'
+                                transition: 'color 0.3s',
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                textDecoration: 'none'
                             }}>
                                 Contact
-                            </button>
+                            </Link>
                         </div>
                     </nav>
                 </div>
@@ -424,7 +437,8 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
             }}>
                 {/* Top row: Logo and Menu */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <button
+                    <Link
+                        to="/"
                         onClick={() => {
                             onFilterChange('style', null);
                             onFilterChange('location', null);
@@ -435,7 +449,9 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             border: 'none',
                             padding: 0,
                             cursor: 'pointer',
-                            textAlign: 'left'
+                            textAlign: 'left',
+                            textDecoration: 'none',
+                            color: darkMode ? 'var(--text-color)' : '#000'
                         }}
                     >
                         <h1 style={{
@@ -446,7 +462,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                         }}>
                             TORONTO GRAFFITI
                         </h1>
-                    </button>
+                    </Link>
 
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
