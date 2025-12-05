@@ -100,6 +100,8 @@ function App() {
       <PhotoModal
         photo={selectedPhoto}
         onClose={() => setSelectedPhoto(null)}
+        photos={filteredPhotos}
+        onNavigate={setSelectedPhoto}
       />
 
       {cursorEffectEnabled && <CursorEffect />}

@@ -32,7 +32,7 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
                     <div style={{
                         display: 'flex',
                         gap: '10px',
-                        color: 'var(--accent-color)'
+                        color: 'var(--light-grey)'
                     }}>
                         <button
                             onClick={() => setPage(p => Math.max(0, p - 1))}
@@ -281,7 +281,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             darkMode={darkMode}
                         />
 
-                        <div style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <button style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
@@ -290,6 +290,10 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             }}>
                                 About
                             </button>
+                            <span style={{
+                                fontSize: '0.9rem',
+                                color: darkMode ? 'var(--grey)' : 'var(--dark-grey)'
+                            }}>/</span>
                             <button style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
@@ -303,25 +307,34 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 </div>
 
                 <div style={{ marginTop: '40px' }}>
+                    <h3 style={{
+                        fontSize: '0.7rem',
+                        color: 'var(--grey)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        marginBottom: '15px'
+                    }}>
+                        Options
+                    </h3>
                     <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
-                        {/* Instagram Button */}
+                        {/* Color Mode Toggle */}
                         <button
-                            onClick={() => window.open('https://www.instagram.com/flown_canary', '_blank')}
+                            onClick={onColorModeToggle}
                             style={{
                                 background: 'none',
                                 border: 'none',
                                 cursor: 'pointer',
-                                color: darkMode ? 'var(--text-color)' : '#000',
+                                color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
                                 display: 'flex',
                                 alignItems: 'center',
                                 padding: 0,
-                                transition: 'transform 0.2s'
+                                transition: 'transform 0.2s, color 0.3s'
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            title="Follow on Instagram"
+                            title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
                         >
-                            <Instagram size={20} />
+                            <Palette size={20} />
                         </button>
 
                         {/* Theme Toggle */}
@@ -382,26 +395,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             title="Shuffle & Clear Filters"
                         >
                             <Dices size={20} />
-                        </button>
-
-                        {/* Color Mode Toggle */}
-                        <button
-                            onClick={onColorModeToggle}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s, color 0.3s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
-                        >
-                            <Palette size={20} />
                         </button>
                     </div>
 
@@ -499,15 +492,35 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 {/* Control buttons - visible when menu open */}
                 {mobileMenuOpen && (
                     <div style={{
-                        display: 'flex',
-                        gap: '15px',
-                        alignItems: 'center',
                         paddingTop: '12px',
                         borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
                     }}>
-                        <button
-                            onClick={() => window.open('https://www.instagram.com/flown_canary', '_blank')}
-                            style={{
+                        <h3 style={{
+                            fontSize: '0.7rem',
+                            color: 'var(--grey)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            marginBottom: '12px'
+                        }}>
+                            Options
+                        </h3>
+                        <div style={{
+                            display: 'flex',
+                            gap: '15px',
+                            alignItems: 'center'
+                        }}>
+                            <button onClick={onColorModeToggle} style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0
+                            }}>
+                                <Palette size={20} />
+                            </button>
+                            <button onClick={onThemeToggle} style={{
                                 background: 'none',
                                 border: 'none',
                                 cursor: 'pointer',
@@ -515,54 +528,32 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 display: 'flex',
                                 alignItems: 'center',
                                 padding: 0
-                            }}
-                        >
-                            <Instagram size={20} />
-                        </button>
-                        <button onClick={onThemeToggle} style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: darkMode ? 'var(--text-color)' : '#000',
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: 0
-                        }}>
-                            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                        </button>
-                        <button onClick={onCursorToggle} style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: cursorEffectEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: 0
-                        }}>
-                            <Sparkles size={20} />
-                        </button>
-                        <button onClick={onShuffle} style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: darkMode ? 'var(--text-color)' : '#000',
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: 0
-                        }}>
-                            <Dices size={20} />
-                        </button>
-                        <button onClick={onColorModeToggle} style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: 0
-                        }}>
-                            <Palette size={20} />
-                        </button>
+                            }}>
+                                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                            </button>
+                            <button onClick={onCursorToggle} style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: cursorEffectEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0
+                            }}>
+                                <Sparkles size={20} />
+                            </button>
+                            <button onClick={onShuffle} style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0
+                            }}>
+                                <Dices size={20} />
+                            </button>
+                        </div>
                     </div>
                 )}
             </header>

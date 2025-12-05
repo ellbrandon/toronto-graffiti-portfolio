@@ -1,20 +1,38 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const PhotoModal = ({ photo, onClose }) => {
+const PhotoModal = ({ photo, onClose, photos = [], onNavigate }) => {
     useEffect(() => {
-        const handleEsc = (e) => {
+        const handleKeyDown = (e) => {
             if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowLeft') handlePrevious();
+            if (e.key === 'ArrowRight') handleNext();
         };
-        window.addEventListener('keydown', handleEsc);
+        window.addEventListener('keydown', handleKeyDown);
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
         return () => {
-            window.removeEventListener('keydown', handleEsc);
+            window.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = 'unset';
         };
-    }, [onClose]);
+    }, [onClose, photo, photos]);
 
     if (!photo) return null;
+
+    const currentIndex = photos.findIndex(p => p.id === photo.id);
+    const hasPrevious = currentIndex > 0;
+    const hasNext = currentIndex < photos.length - 1;
+
+    const handlePrevious = () => {
+        if (hasPrevious) {
+            onNavigate(photos[currentIndex - 1]);
+        }
+    };
+
+    const handleNext = () => {
+        if (hasNext) {
+            onNavigate(photos[currentIndex + 1]);
+        }
+    };
 
     return (
         <div
@@ -41,17 +59,85 @@ const PhotoModal = ({ photo, onClose }) => {
                     right: '20px',
                     color: 'white',
                     padding: '10px',
-                    zIndex: 1001
+                    zIndex: 1001,
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer'
                 }}
             >
                 <X size={32} />
             </button>
 
+            {/* Previous button */}
+            {hasPrevious && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handlePrevious();
+                    }}
+                    style={{
+                        position: 'absolute',
+                        left: '20px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: 'white',
+                        padding: '10px',
+                        zIndex: 1001,
+                        background: 'rgba(0,0,0,0.5)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+                >
+                    <ChevronLeft size={32} />
+                </button>
+            )}
+
+            {/* Next button */}
+            {hasNext && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleNext();
+                    }}
+                    style={{
+                        position: 'absolute',
+                        right: '20px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: 'white',
+                        padding: '10px',
+                        zIndex: 1001,
+                        background: 'rgba(0,0,0,0.5)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+                >
+                    <ChevronRight size={32} />
+                </button>
+            )}
+
             <div
                 style={{
                     maxWidth: '90vw',
                     maxHeight: '90vh',
-                    position: 'relative'
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '20px'
                 }}
                 onClick={e => e.stopPropagation()}
             >
@@ -60,29 +146,16 @@ const PhotoModal = ({ photo, onClose }) => {
                     alt={`${photo.style} at ${photo.location}`}
                     style={{
                         maxWidth: '100%',
-                        maxHeight: '85vh',
+                        maxHeight: 'calc(90vh - 120px)',
                         objectFit: 'contain',
                         boxShadow: '0 0 50px rgba(0,0,0,0.5)'
                     }}
                 />
-                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
                     <h2 style={{ fontSize: '1.5rem', marginBottom: '5px' }}>{photo.location}</h2>
                     <p style={{ color: '#888' }}>
                         <span style={{ color: '#fff' }}>{photo.author}</span> • {photo.style}
                     </p>
-                    <div style={{ marginTop: '10px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                        {photo.tags.map(tag => (
-                            <span key={tag} style={{
-                                fontSize: '0.8rem',
-                                padding: '4px 8px',
-                                border: '1px solid #333',
-                                borderRadius: '4px',
-                                color: '#888'
-                            }}>
-                                #{tag}
-                            </span>
-                        ))}
-                    </div>
                 </div>
             </div>
         </div>
