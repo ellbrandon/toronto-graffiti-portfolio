@@ -16,8 +16,10 @@ const MagicCursor = ({ darkMode, outerSize = 30, hoverScale = 1.5 }) => {
     const [isVisible, setIsVisible] = useState(false); // Hide until first movement
 
     useEffect(() => {
+        console.log("MagicCursor: Mounted. Adding class.");
         document.body.classList.add('magic-cursor-enabled');
         return () => {
+            console.log("MagicCursor: Unmounted. Removing class.");
             document.body.classList.remove('magic-cursor-enabled');
         };
     }, []);

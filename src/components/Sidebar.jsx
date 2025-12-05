@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown, Wand2, MousePointer2 } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
     const [page, setPage] = useState(0);
@@ -74,7 +74,26 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
                                 : 'var(--hover-color)',
                             fontWeight: !activeItem ? 'bold' : 'normal',
                             textAlign: 'left',
-                            transition: 'color 0.3s'
+                            transition: 'color 0.3s, transform 0.3s',
+                            transform: 'translateX(0)',
+                            display: 'block',
+                            width: '100%',
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (activeItem) { // Only animate if not active
+                                e.currentTarget.style.color = darkMode ? 'var(--text-color)' : 'var(--text-color-dark)';
+                                e.currentTarget.style.transform = 'translateX(5px)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (activeItem) {
+                                e.currentTarget.style.color = 'var(--hover-color)';
+                                e.currentTarget.style.transform = 'translateX(0)';
+                            }
                         }}
                     >
                         All
@@ -89,7 +108,26 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
                                 color: activeItem === item ? (darkMode ? 'var(--text-color)' : '#000000') : 'var(--hover-color)',
                                 fontWeight: activeItem === item ? 'bold' : 'normal',
                                 textAlign: 'left',
-                                transition: 'color 0.3s'
+                                transition: 'color 0.3s, transform 0.3s',
+                                transform: 'translateX(0)',
+                                display: 'block',
+                                width: '100%',
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (activeItem !== item) {
+                                    e.currentTarget.style.color = darkMode ? 'var(--text-color)' : 'var(--text-color-dark)';
+                                    e.currentTarget.style.transform = 'translateX(5px)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (activeItem !== item) {
+                                    e.currentTarget.style.color = 'var(--hover-color)';
+                                    e.currentTarget.style.transform = 'translateX(0)';
+                                }
                             }}
                         >
                             {item}
@@ -199,7 +237,7 @@ const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => 
     );
 };
 
-const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
+const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, magicCursorEnabled, onMagicCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
     const location = useLocation();
     const showFilters = location.pathname === '/';
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -374,6 +412,29 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         >
                             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                        </button>
+
+                        {/* Magic Cursor Toggle */}
+                        <button
+                            onClick={(e) => {
+                                console.log("Sidebar: Magic Cursor Toggle Clicked");
+                                onMagicCursorToggle(e);
+                            }}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: magicCursorEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s, color 0.3s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title={magicCursorEnabled ? 'Disable Magic Cursor' : 'Enable Magic Cursor'}
+                        >
+                            {magicCursorEnabled ? <Wand2 size={20} /> : <MousePointer2 size={20} />}
                         </button>
 
                         {/* Cursor Effect Toggle */}
@@ -554,6 +615,20 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 padding: 0
                             }}>
                                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                            </button>
+                            <button onClick={(e) => {
+                                console.log("Mobile Sidebar: Magic Cursor Toggle Clicked");
+                                onMagicCursorToggle(e);
+                            }} style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: magicCursorEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0
+                            }}>
+                                {magicCursorEnabled ? <Wand2 size={20} /> : <MousePointer2 size={20} />}
                             </button>
                             <button onClick={onCursorToggle} style={{
                                 background: 'none',

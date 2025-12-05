@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { photos } from './data/photos';
 
 // Feature Flags
-const ENABLE_MAGIC_CURSOR = true;
+// ENABLE_MAGIC_CURSOR replaced by state
 const MAGIC_CURSOR_SIZE_DEFAULT = 25; // Default size in pixels
 const MAGIC_CURSOR_SIZE_HOVER = 50;   // Zoomed size in pixels
 
@@ -25,6 +25,7 @@ const shuffleArray = (array) => {
 };
 
 function App() {
+  const [magicCursorEnabled, setMagicCursorEnabled] = useState(true);
   const [cursorEffectEnabled, setCursorEffectEnabled] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [colorMode, setColorMode] = useState(false); // false = grayscale default, true = color default
@@ -86,6 +87,14 @@ function App() {
           onThemeToggle={() => setDarkMode(!darkMode)}
           cursorEffectEnabled={cursorEffectEnabled}
           onCursorToggle={() => setCursorEffectEnabled(!cursorEffectEnabled)}
+          magicCursorEnabled={magicCursorEnabled}
+          onMagicCursorToggle={() => {
+            console.log("App: Toggling Magic Cursor. Current state:", magicCursorEnabled);
+            setMagicCursorEnabled(prev => {
+              console.log("App: New state will be:", !prev);
+              return !prev;
+            });
+          }}
           colorMode={colorMode}
           onColorModeToggle={() => setColorMode(!colorMode)}
           onShuffle={handleShuffle}
@@ -126,7 +135,7 @@ function App() {
         />
 
         {cursorEffectEnabled && <CursorEffect />}
-        {ENABLE_MAGIC_CURSOR && (
+        {magicCursorEnabled && (
           <MagicCursor
             darkMode={darkMode}
             outerSize={MAGIC_CURSOR_SIZE_DEFAULT}
