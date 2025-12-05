@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
@@ -86,7 +86,7 @@ const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3
                             onClick={() => onItemClick(item)}
                             style={{
                                 fontSize: '0.9rem',
-                                color: activeItem === item ? 'var(--text-color)' : 'var(--hover-color)',
+                                color: activeItem === item ? (darkMode ? 'var(--text-color)' : '#000000') : 'var(--hover-color)',
                                 fontWeight: activeItem === item ? 'bold' : 'normal',
                                 textAlign: 'left',
                                 transition: 'color 0.3s'
@@ -200,6 +200,8 @@ const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => 
 };
 
 const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
+    const location = useLocation();
+    const showFilters = location.pathname === '/';
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -259,32 +261,36 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                     </Link>
 
                     <nav>
-                        <FilterSection
-                            title="Styles"
-                            items={filters.styles}
-                            activeItem={activeFilters.style}
-                            onItemClick={(val) => onFilterChange('style', val)}
-                            itemsPerPage={4}
-                            darkMode={darkMode}
-                        />
+                        {showFilters && (
+                            <>
+                                <FilterSection
+                                    title="Styles"
+                                    items={filters.styles}
+                                    activeItem={activeFilters.style}
+                                    onItemClick={(val) => onFilterChange('style', val)}
+                                    itemsPerPage={4}
+                                    darkMode={darkMode}
+                                />
 
-                        <FilterSection
-                            title="Locations"
-                            items={filters.locations}
-                            activeItem={activeFilters.location}
-                            onItemClick={(val) => onFilterChange('location', val)}
-                            itemsPerPage={4}
-                            darkMode={darkMode}
-                        />
+                                <FilterSection
+                                    title="Locations"
+                                    items={filters.locations}
+                                    activeItem={activeFilters.location}
+                                    onItemClick={(val) => onFilterChange('location', val)}
+                                    itemsPerPage={4}
+                                    darkMode={darkMode}
+                                />
 
-                        <FilterSection
-                            title="Artists"
-                            items={filters.authors}
-                            activeItem={activeFilters.author}
-                            onItemClick={(val) => onFilterChange('author', val)}
-                            itemsPerPage={4}
-                            darkMode={darkMode}
-                        />
+                                <FilterSection
+                                    title="Artists"
+                                    items={filters.authors}
+                                    activeItem={activeFilters.author}
+                                    onItemClick={(val) => onFilterChange('author', val)}
+                                    itemsPerPage={4}
+                                    darkMode={darkMode}
+                                />
+                            </>
+                        )}
 
                         <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <Link to="/about" style={{
@@ -481,29 +487,31 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 </div>
 
                 {/* Filter dropdowns */}
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                    <MobileDropdown
-                        title="Styles"
-                        items={filters.styles}
-                        activeItem={activeFilters.style}
-                        onItemClick={(val) => onFilterChange('style', val)}
-                        darkMode={darkMode}
-                    />
-                    <MobileDropdown
-                        title="Locations"
-                        items={filters.locations}
-                        activeItem={activeFilters.location}
-                        onItemClick={(val) => onFilterChange('location', val)}
-                        darkMode={darkMode}
-                    />
-                    <MobileDropdown
-                        title="Artists"
-                        items={filters.authors}
-                        activeItem={activeFilters.author}
-                        onItemClick={(val) => onFilterChange('author', val)}
-                        darkMode={darkMode}
-                    />
-                </div>
+                {showFilters && (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                        <MobileDropdown
+                            title="Styles"
+                            items={filters.styles}
+                            activeItem={activeFilters.style}
+                            onItemClick={(val) => onFilterChange('style', val)}
+                            darkMode={darkMode}
+                        />
+                        <MobileDropdown
+                            title="Locations"
+                            items={filters.locations}
+                            activeItem={activeFilters.location}
+                            onItemClick={(val) => onFilterChange('location', val)}
+                            darkMode={darkMode}
+                        />
+                        <MobileDropdown
+                            title="Artists"
+                            items={filters.authors}
+                            activeItem={activeFilters.author}
+                            onItemClick={(val) => onFilterChange('author', val)}
+                            darkMode={darkMode}
+                        />
+                    </div>
+                )}
 
                 {/* Control buttons - visible when menu open */}
                 {mobileMenuOpen && (
