@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, Sparkles, Dices, Palette, Menu, X, ChevronDown } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
     const [page, setPage] = useState(0);
@@ -334,7 +334,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
                         >
-                            <Palette size={20} />
+                            <PaintbrushVertical size={20} />
                         </button>
 
                         {/* Theme Toggle */}
@@ -374,7 +374,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             title={cursorEffectEnabled ? 'Disable Spray Effect' : 'Enable Spray Effect'}
                         >
-                            <Sparkles size={20} />
+                            <SprayCan size={20} />
                         </button>
 
                         {/* Shuffle Button */}
@@ -518,7 +518,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 alignItems: 'center',
                                 padding: 0
                             }}>
-                                <Palette size={20} />
+                                <PaintbrushVertical size={20} />
                             </button>
                             <button onClick={onThemeToggle} style={{
                                 background: 'none',
@@ -540,7 +540,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 alignItems: 'center',
                                 padding: 0
                             }}>
-                                <Sparkles size={20} />
+                                <SprayCan size={20} />
                             </button>
                             <button onClick={onShuffle} style={{
                                 background: 'none',
