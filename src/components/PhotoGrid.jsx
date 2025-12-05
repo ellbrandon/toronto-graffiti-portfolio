@@ -10,44 +10,57 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode }) => {
     useEffect(() => {
         if (!gridRef.current) return;
 
-        // Initialize Masonry
-        masonryRef.current = new Masonry(gridRef.current, {
-            itemSelector: '.grid-item',
-            columnWidth: '.grid-sizer',
-            percentPosition: true,
-            gutter: 20,
-            transitionDuration: 0 // Disable animation on initial layout
-        });
+        // Initialize Masonry only once
+        if (!masonryRef.current) {
+            masonryRef.current = new Masonry(gridRef.current, {
+                itemSelector: '.grid-item',
+                columnWidth: '.grid-sizer',
+                percentPosition: true,
+                gutter: 20,
+                transitionDuration: 0
+            });
+        }
 
-        // Wait for all images to load before showing
+        // Wait for images to load
         const imgLoad = imagesLoaded(gridRef.current);
 
         imgLoad.on('progress', () => {
-            masonryRef.current.layout();
+            if (masonryRef.current) {
+                masonryRef.current.reloadItems();
+                masonryRef.current.layout();
+            }
         });
 
         imgLoad.on('done', () => {
-            masonryRef.current.layout();
-            // Small delay to ensure layout is completely stable
-            setTimeout(() => {
-                setIsReady(true);
-            }, 100);
+            if (masonryRef.current) {
+                masonryRef.current.reloadItems();
+                masonryRef.current.layout();
+            }
+            setIsReady(true);
         });
 
         return () => {
-            if (masonryRef.current) {
-                masonryRef.current.destroy();
-            }
+            // Don't destroy masonry, just let it persist
         };
     }, [photos]);
+
+    // Cleanup on unmount only
+    useEffect(() => {
+        return () => {
+            if (masonryRef.current) {
+                masonryRef.current.destroy();
+                masonryRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <div className="container" style={{ paddingBottom: '100px' }}>
             <div
                 ref={gridRef}
                 style={{
-                    opacity: isReady ? 1 : 0,
-                    transition: 'opacity 0.5s ease-in'
+                    opacity: 1,
+                    transition: 'none'
                 }}
             >
                 {/* Grid sizer for column width */}

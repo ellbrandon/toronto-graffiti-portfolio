@@ -1,20 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PhotoModal = ({ photo, onClose, photos = [], onNavigate }) => {
     useEffect(() => {
+        if (!photo) return;
+
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape') onClose();
-            if (e.key === 'ArrowLeft') handlePrevious();
-            if (e.key === 'ArrowRight') handleNext();
+            const currentIndex = photos.findIndex(p => p.id === photo.id);
+
+            if (e.key === 'Escape') {
+                onClose();
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                onNavigate(photos[currentIndex - 1]);
+            } else if (e.key === 'ArrowRight' && currentIndex < photos.length - 1) {
+                onNavigate(photos[currentIndex + 1]);
+            }
         };
+
         window.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        document.body.style.overflow = 'hidden';
+
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = 'unset';
         };
-    }, [onClose, photo, photos]);
+    }, [photo, photos, onClose, onNavigate]);
 
     if (!photo) return null;
 

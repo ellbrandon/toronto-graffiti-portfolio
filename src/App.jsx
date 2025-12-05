@@ -43,7 +43,7 @@ function App() {
       if (activeFilters.author && photo.author !== activeFilters.author) return false;
       return true;
     });
-  }, [activeFilters]);
+  }, [shuffledPhotos, activeFilters]);
 
   const handleFilterChange = (type, value) => {
     setActiveFilters(prev => ({
