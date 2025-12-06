@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown, Wand2, MousePointer2 } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown, Wand2, MousePointer2, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
     const [page, setPage] = useState(0);
@@ -237,7 +237,7 @@ const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => 
     );
 };
 
-const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, magicCursorEnabled, onMagicCursorToggle, colorMode, onColorModeToggle, onShuffle }) => {
+const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, magicCursorEnabled, onMagicCursorToggle, colorMode, onColorModeToggle, onShuffle, layoutMode, onLayoutToggle }) => {
     const location = useLocation();
     const showFilters = location.pathname === '/';
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -437,6 +437,29 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             {magicCursorEnabled ? <Wand2 size={20} /> : <MousePointer2 size={20} />}
                         </button>
 
+                        {/* Layout Toggle */}
+                        <button
+                            onClick={onLayoutToggle}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0,
+                                transition: 'transform 0.2s, color 0.3s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            title={`Current Layout: ${layoutMode}`}
+                        >
+                            {layoutMode === 'masonry' && <LayoutDashboard size={20} />}
+                            {layoutMode === 'grid' && <LayoutGrid size={20} />}
+                            {layoutMode === 'single' && <RectangleVertical size={20} />}
+                            {layoutMode === 'full' && <Maximize size={20} />}
+                        </button>
+
                         {/* Cursor Effect Toggle */}
                         <button
                             onClick={onCursorToggle}
@@ -629,6 +652,20 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 padding: 0
                             }}>
                                 {magicCursorEnabled ? <Wand2 size={20} /> : <MousePointer2 size={20} />}
+                            </button>
+                            <button onClick={onLayoutToggle} style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: 0
+                            }}>
+                                {layoutMode === 'masonry' && <LayoutDashboard size={20} />}
+                                {layoutMode === 'grid' && <LayoutGrid size={20} />}
+                                {layoutMode === 'single' && <RectangleVertical size={20} />}
+                                {layoutMode === 'full' && <Maximize size={20} />}
                             </button>
                             <button onClick={onCursorToggle} style={{
                                 background: 'none',

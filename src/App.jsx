@@ -37,6 +37,7 @@ function App() {
   const [cursorEffectEnabled, setCursorEffectEnabled] = useState(() => getInitialState('cursorEffectEnabled', false));
   const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
   const [colorMode, setColorMode] = useState(() => getInitialState('colorMode', false)); // false = grayscale default, true = color default
+  const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
 
   // Persist settings
   useEffect(() => {
@@ -54,6 +55,16 @@ function App() {
   useEffect(() => {
     localStorage.setItem('colorMode', JSON.stringify(colorMode));
   }, [colorMode]);
+
+  useEffect(() => {
+    localStorage.setItem('layoutMode', JSON.stringify(layoutMode));
+  }, [layoutMode]);
+
+  const handleLayoutToggle = () => {
+    const modes = ['masonry', 'grid', 'single', 'full'];
+    const nextIndex = (modes.indexOf(layoutMode) + 1) % modes.length;
+    setLayoutMode(modes[nextIndex]);
+  };
   const [shuffledPhotos, setShuffledPhotos] = useState(() => shuffleArray(photos));
   const [activeFilters, setActiveFilters] = useState({
     location: null,
@@ -123,6 +134,8 @@ function App() {
           colorMode={colorMode}
           onColorModeToggle={() => setColorMode(!colorMode)}
           onShuffle={handleShuffle}
+          layoutMode={layoutMode}
+          onLayoutToggle={handleLayoutToggle}
         />
 
         <main className="main-content" style={{
@@ -143,6 +156,7 @@ function App() {
                     photos={filteredPhotos}
                     onPhotoClick={setSelectedPhoto}
                     colorMode={colorMode}
+                    layoutMode={layoutMode}
                   />
                 </div>
               } />
