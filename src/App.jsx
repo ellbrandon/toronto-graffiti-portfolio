@@ -4,6 +4,7 @@ import PhotoGrid from './components/PhotoGrid';
 import PhotoModal from './components/PhotoModal';
 import CursorEffect from './components/CursorEffect';
 import MagicCursor from './components/MagicCursor';
+import RevealEffect from './components/RevealEffect';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -36,8 +37,9 @@ function App() {
   const [magicCursorEnabled, setMagicCursorEnabled] = useState(() => getInitialState('magicCursorEnabled', true));
   const [cursorEffectEnabled, setCursorEffectEnabled] = useState(() => getInitialState('cursorEffectEnabled', false));
   const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
-  const [colorMode, setColorMode] = useState(() => getInitialState('colorMode', false)); // false = grayscale default, true = color default
+  const [colorMode, setColorMode] = useState(() => getInitialState('colorMode', true)); // true = color default, false = grayscale default
   const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
+  const [showReveal, setShowReveal] = useState(true); // Always show for testing
 
   // Persist settings
   useEffect(() => {
@@ -59,6 +61,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('layoutMode', JSON.stringify(layoutMode));
   }, [layoutMode]);
+
+  const handleRevealDismiss = () => {
+    setShowReveal(false);
+    // localStorage.setItem('hasSeenReveal', JSON.stringify(true)); // Disabled for testing
+  };
 
   const handleLayoutToggle = () => {
     const modes = ['masonry', 'grid', 'single', 'full'];
@@ -181,6 +188,8 @@ function App() {
             hoverScale={MAGIC_CURSOR_SIZE_HOVER / MAGIC_CURSOR_SIZE_DEFAULT}
           />
         )}
+
+        {showReveal && <RevealEffect onDismiss={handleRevealDismiss} />}
 
         <style>{`
           @media (max-width: 768px) {
