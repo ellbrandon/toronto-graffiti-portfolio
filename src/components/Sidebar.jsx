@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Instagram, ChevronLeft, ChevronRight, Sun, Moon, SprayCan, Dices, PaintbrushVertical, Menu, X, ChevronDown, Wand2, MousePointer2, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sun, Moon, Menu, X, ChevronDown, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize } from 'lucide-react';
 
 const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
     const [page, setPage] = useState(0);
@@ -237,7 +237,7 @@ const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => 
     );
 };
 
-const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, cursorEffectEnabled, onCursorToggle, magicCursorEnabled, onMagicCursorToggle, colorMode, onColorModeToggle, onShuffle, layoutMode, onLayoutToggle }) => {
+const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, layoutMode, onLayoutToggle }) => {
     const location = useLocation();
     const showFilters = location.pathname === '/';
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -374,26 +374,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                         Options
                     </h3>
                     <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
-                        {/* Color Mode Toggle */}
-                        <button
-                            onClick={onColorModeToggle}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s, color 0.3s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            title={colorMode ? 'Switch to Grayscale Default' : 'Switch to Color Default'}
-                        >
-                            <PaintbrushVertical size={20} />
-                        </button>
-
                         {/* Theme Toggle */}
                         <button
                             onClick={onThemeToggle}
@@ -412,29 +392,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                         >
                             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                        </button>
-
-                        {/* Magic Cursor Toggle */}
-                        <button
-                            onClick={(e) => {
-                                console.log("Sidebar: Magic Cursor Toggle Clicked");
-                                onMagicCursorToggle(e);
-                            }}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: magicCursorEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s, color 0.3s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            title={magicCursorEnabled ? 'Disable Magic Cursor' : 'Enable Magic Cursor'}
-                        >
-                            {magicCursorEnabled ? <Wand2 size={20} /> : <MousePointer2 size={20} />}
                         </button>
 
                         {/* Layout Toggle */}
@@ -458,46 +415,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             {layoutMode === 'grid' && <LayoutGrid size={20} />}
                             {layoutMode === 'single' && <RectangleVertical size={20} />}
                             {layoutMode === 'full' && <Maximize size={20} />}
-                        </button>
-
-                        {/* Cursor Effect Toggle */}
-                        <button
-                            onClick={onCursorToggle}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: cursorEffectEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s, color 0.3s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            title={cursorEffectEnabled ? 'Disable Spray Effect' : 'Enable Spray Effect'}
-                        >
-                            <SprayCan size={20} />
-                        </button>
-
-                        {/* Shuffle Button */}
-                        <button
-                            onClick={onShuffle}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: darkMode ? 'var(--text-color)' : '#000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'rotate(180deg) scale(1.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'rotate(0deg) scale(1)'}
-                            title="Shuffle & Clear Filters"
-                        >
-                            <Dices size={20} />
                         </button>
                     </div>
 
@@ -617,17 +534,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             gap: '15px',
                             alignItems: 'center'
                         }}>
-                            <button onClick={onColorModeToggle} style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: colorMode ? '#ff0000' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0
-                            }}>
-                                <PaintbrushVertical size={20} />
-                            </button>
                             <button onClick={onThemeToggle} style={{
                                 background: 'none',
                                 border: 'none',
@@ -638,20 +544,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 padding: 0
                             }}>
                                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                            </button>
-                            <button onClick={(e) => {
-                                console.log("Mobile Sidebar: Magic Cursor Toggle Clicked");
-                                onMagicCursorToggle(e);
-                            }} style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: magicCursorEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0
-                            }}>
-                                {magicCursorEnabled ? <Wand2 size={20} /> : <MousePointer2 size={20} />}
                             </button>
                             <button onClick={onLayoutToggle} style={{
                                 background: 'none',
@@ -666,28 +558,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 {layoutMode === 'grid' && <LayoutGrid size={20} />}
                                 {layoutMode === 'single' && <RectangleVertical size={20} />}
                                 {layoutMode === 'full' && <Maximize size={20} />}
-                            </button>
-                            <button onClick={onCursorToggle} style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: cursorEffectEnabled ? '#00ff00' : (darkMode ? 'var(--text-color)' : '#000'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0
-                            }}>
-                                <SprayCan size={20} />
-                            </button>
-                            <button onClick={onShuffle} style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: darkMode ? 'var(--text-color)' : '#000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0
-                            }}>
-                                <Dices size={20} />
                             </button>
                         </div>
                     </div>

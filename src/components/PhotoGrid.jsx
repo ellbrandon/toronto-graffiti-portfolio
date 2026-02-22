@@ -196,29 +196,15 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
         /* Image fade-in effect */
         .photo-img {
           opacity: 1;
-          filter: grayscale(100%) contrast(110%);
-          transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
           will-change: transform;
         }
 
-        /* Grayscale mode (default) */
-        .grayscale-mode {
-          filter: grayscale(100%) contrast(110%);
-        }
-
-        .grayscale-mode:hover {
-          filter: grayscale(0%) contrast(100%) brightness(1.1);
-          transform: scale(1.05);
-          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Color mode */
         .color-mode {
-          filter: grayscale(0%) contrast(100%);
+          filter: none;
         }
 
         .color-mode:hover {
-          filter: grayscale(100%) contrast(110%);
           transform: scale(1.05);
           box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         }

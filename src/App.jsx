@@ -2,18 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import PhotoModal from './components/PhotoModal';
-import CursorEffect from './components/CursorEffect';
-import MagicCursor from './components/MagicCursor';
-import RevealEffect from './components/RevealEffect';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { photos } from './data/photos';
-
-// Feature Flags
-// ENABLE_MAGIC_CURSOR replaced by state
-const MAGIC_CURSOR_SIZE_DEFAULT = 25; // Default size in pixels
-const MAGIC_CURSOR_SIZE_HOVER = 50;   // Zoomed size in pixels
 
 // Shuffle function
 const shuffleArray = (array) => {
@@ -34,45 +26,24 @@ const getInitialState = (key, defaultValue) => {
 };
 
 function App() {
-  const [magicCursorEnabled, setMagicCursorEnabled] = useState(() => getInitialState('magicCursorEnabled', true));
-  const [cursorEffectEnabled, setCursorEffectEnabled] = useState(() => getInitialState('cursorEffectEnabled', false));
   const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
-  const [colorMode, setColorMode] = useState(() => getInitialState('colorMode', true)); // true = color default, false = grayscale default
   const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
-  const [showReveal, setShowReveal] = useState(true); // Always show for testing
 
   // Persist settings
-  useEffect(() => {
-    localStorage.setItem('magicCursorEnabled', JSON.stringify(magicCursorEnabled));
-  }, [magicCursorEnabled]);
-
-  useEffect(() => {
-    localStorage.setItem('cursorEffectEnabled', JSON.stringify(cursorEffectEnabled));
-  }, [cursorEffectEnabled]);
-
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
   useEffect(() => {
-    localStorage.setItem('colorMode', JSON.stringify(colorMode));
-  }, [colorMode]);
-
-  useEffect(() => {
     localStorage.setItem('layoutMode', JSON.stringify(layoutMode));
   }, [layoutMode]);
-
-  const handleRevealDismiss = () => {
-    setShowReveal(false);
-    // localStorage.setItem('hasSeenReveal', JSON.stringify(true)); // Disabled for testing
-  };
 
   const handleLayoutToggle = () => {
     const modes = ['masonry', 'grid', 'single', 'full'];
     const nextIndex = (modes.indexOf(layoutMode) + 1) % modes.length;
     setLayoutMode(modes[nextIndex]);
   };
-  const [shuffledPhotos, setShuffledPhotos] = useState(() => shuffleArray(photos));
+  const [shuffledPhotos] = useState(() => shuffleArray(photos));
   const [activeFilters, setActiveFilters] = useState({
     location: null,
     style: null,
@@ -105,17 +76,8 @@ function App() {
     }));
   };
 
-  const handleShuffle = () => {
-    setShuffledPhotos(shuffleArray(photos));
-    setActiveFilters({
-      location: null,
-      style: null,
-      author: null
-    });
-  };
-
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <div className="app" style={{
         display: 'flex',
         backgroundColor: darkMode ? '#000000' : '#ffffff',
@@ -128,19 +90,6 @@ function App() {
           onFilterChange={handleFilterChange}
           darkMode={darkMode}
           onThemeToggle={() => setDarkMode(!darkMode)}
-          cursorEffectEnabled={cursorEffectEnabled}
-          onCursorToggle={() => setCursorEffectEnabled(!cursorEffectEnabled)}
-          magicCursorEnabled={magicCursorEnabled}
-          onMagicCursorToggle={() => {
-            console.log("App: Toggling Magic Cursor. Current state:", magicCursorEnabled);
-            setMagicCursorEnabled(prev => {
-              console.log("App: New state will be:", !prev);
-              return !prev;
-            });
-          }}
-          colorMode={colorMode}
-          onColorModeToggle={() => setColorMode(!colorMode)}
-          onShuffle={handleShuffle}
           layoutMode={layoutMode}
           onLayoutToggle={handleLayoutToggle}
         />
@@ -162,13 +111,13 @@ function App() {
                   <PhotoGrid
                     photos={filteredPhotos}
                     onPhotoClick={setSelectedPhoto}
-                    colorMode={colorMode}
+                    colorMode={true}
                     layoutMode={layoutMode}
                   />
                 </div>
               } />
-              <Route path="/about" element={<About darkMode={darkMode} colorMode={colorMode} />} />
-              <Route path="/contact" element={<Contact darkMode={darkMode} colorMode={colorMode} />} />
+              <Route path="/about" element={<About darkMode={darkMode} colorMode={true} />} />
+              <Route path="/contact" element={<Contact darkMode={darkMode} colorMode={true} />} />
             </Routes>
           </div>
         </main>
@@ -179,17 +128,6 @@ function App() {
           photos={filteredPhotos}
           onNavigate={setSelectedPhoto}
         />
-
-        {cursorEffectEnabled && <CursorEffect />}
-        {magicCursorEnabled && (
-          <MagicCursor
-            darkMode={darkMode}
-            outerSize={MAGIC_CURSOR_SIZE_DEFAULT}
-            hoverScale={MAGIC_CURSOR_SIZE_HOVER / MAGIC_CURSOR_SIZE_DEFAULT}
-          />
-        )}
-
-        {showReveal && <RevealEffect onDismiss={handleRevealDismiss} />}
 
         <style>{`
           @media (max-width: 768px) {
