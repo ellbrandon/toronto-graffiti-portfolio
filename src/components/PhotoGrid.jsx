@@ -41,6 +41,8 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
                                 alt={`${photo.what} at ${photo.where}`}
                                 className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
                                 style={{ objectFit: layoutMode === 'grid' ? 'cover' : 'initial' }}
+                                loading="lazy"
+                                decoding="async"
                             />
                             <div className="overlay">
                                 {photo.where || photo.writer ? (

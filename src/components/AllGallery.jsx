@@ -31,7 +31,7 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
                         onClick={() => onSelect(value)}
                     >
                         <div className="gallery-item-inner">
-                            <img src={photo.url} alt={value} />
+                            <img src={photo.url} alt={value} loading="lazy" decoding="async" />
                             <div className="gallery-item-overlay">
                                 <p className="gallery-item-label">{value}</p>
                             </div>
