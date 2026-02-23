@@ -173,7 +173,7 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
                             style={{
                                 background: 'rgba(255,255,255,0.08)',
                                 border: '1px solid rgba(255,255,255,0.2)',
-                                borderRadius: '3px',
+                                borderRadius: '0',
                                 color: '#fff',
                                 fontSize: '0.8rem',
                                 padding: '5px 12px',

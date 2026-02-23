@@ -163,7 +163,7 @@ function App() {
                     }
 
                     return (
-                      <div style={{ padding: '0 40px 16px', display: 'flex', alignItems: 'center' }}>
+                      <div style={{ padding: '0 40px 16px 0', display: 'flex', alignItems: 'center' }}>
                         {crumbs}
                       </div>
                     );
@@ -183,6 +183,7 @@ function App() {
                       onPhotoClick={setSelectedPhoto}
                       colorMode={true}
                       layoutMode={layoutMode}
+                      onClearFilters={() => setActiveFilters({ writer: null, what: null, where: null })}
                     />
                   )}
                 </div>

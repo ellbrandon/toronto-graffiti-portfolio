@@ -93,7 +93,7 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
     };
 
     return (
-        <div style={{ padding: '0 40px 100px' }}>
+        <div style={{ padding: '0 40px 100px 0' }}>
             <div
                 ref={gridRef}
                 className={layoutMode === 'grid' ? 'allgallery-grid' : ''}

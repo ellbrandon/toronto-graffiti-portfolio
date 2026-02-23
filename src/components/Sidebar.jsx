@@ -12,7 +12,7 @@ const IconInput = ({ iconLeft, iconRight, darkMode, onClick, children }) => {
                 display: 'flex',
                 alignItems: 'center',
                 border: `1px solid ${borderColor}`,
-                borderRadius: '3px',
+                borderRadius: '0',
                 padding: '6px 8px',
                 cursor: 'text',
                 gap: '6px',
@@ -110,7 +110,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
                     right: 0,
                     backgroundColor: bgColor,
                     border: `1px solid ${borderColor}`,
-                    borderRadius: '3px',
+                    borderRadius: '0',
                     maxHeight: '180px',
                     overflowY: 'auto',
                     zIndex: 500,
@@ -154,14 +154,14 @@ const FilterSection = ({ title, icon, options, value, onChange, placeholder, gal
             <h3 style={{
                 fontSize: '.9rem',
                 color: 'var(--grey)',
-                // textTransform: 'uppercase',
+                textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 marginBottom: '10px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
             }}>
-                {icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
+                {icon && <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', flexShrink: 0 }}>{icon}</span>}
                 {title}
             </h3>
             <SearchableSelect
@@ -180,7 +180,7 @@ const FilterSection = ({ title, icon, options, value, onChange, placeholder, gal
                     padding: '6px 8px',
                     background: '#000',
                     border: '1px solid #000',
-                    borderRadius: '3px',
+                    borderRadius: '0',
                     cursor: 'pointer',
                     fontSize: '0.8rem',
                     color: '#fff',
@@ -232,7 +232,7 @@ const Sidebar = ({
                 position: 'fixed',
                 top: 0,
                 left: 0,
-                padding: '40px',
+                padding: '40px 40px 40px 40px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Masonry from 'masonry-layout';
 import imagesLoaded from 'imagesloaded';
+import { Frown } from 'lucide-react';
 
-const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
+const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters }) => {
     const gridRef = useRef(null);
     const masonryRef = useRef(null);
     const [isReady, setIsReady] = useState(false);
@@ -20,16 +21,19 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
         };
 
         if (layoutMode === 'masonry') {
-            // Initialize Masonry
-            if (!masonryRef.current) {
-                masonryRef.current = new Masonry(gridRef.current, {
-                    itemSelector: '.grid-item',
-                    columnWidth: '.grid-sizer',
-                    percentPosition: true,
-                    gutter: 20,
-                    transitionDuration: 0
-                });
+            // Always destroy and recreate so column layout is recalculated fresh
+            if (masonryRef.current) {
+                masonryRef.current.destroy();
+                masonryRef.current = null;
             }
+
+            masonryRef.current = new Masonry(gridRef.current, {
+                itemSelector: '.grid-item',
+                columnWidth: '.grid-sizer',
+                percentPosition: true,
+                gutter: 20,
+                transitionDuration: 0
+            });
 
             masonryRef.current.reloadItems();
             masonryRef.current.layout();
@@ -51,8 +55,6 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
             return () => {
                 imgLoad.off('progress');
                 clearTimeout(timeoutId);
-                // We don't destroy masonry here to allow for smooth updates, 
-                // but we will if layoutMode changes in the next run due to dependency
             };
 
         } else {
@@ -143,8 +145,51 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
         };
     };
 
+    if (photos.length === 0) {
+        return (
+            <div style={{
+                height: 'calc(100vh - 120px)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px',
+                textAlign: 'center',
+                paddingRight: '40px',
+            }}>
+                <Frown size={48} strokeWidth={1} style={{ color: 'var(--grey)' }} />
+                <p style={{ fontSize: '1.4rem', fontWeight: '500', color: 'var(--text-color)' }}>
+                    No photos found
+                </p>
+                <p style={{ fontSize: '0.9rem', color: 'var(--grey)', lineHeight: '1.7' }}>
+                    No images match the current filters.<br />
+                    Try adjusting your search or clearing a filter.
+                </p>
+                <button
+                    onClick={onClearFilters}
+                    style={{
+                        marginTop: '8px',
+                        padding: '8px 20px',
+                        background: 'none',
+                        border: '1px solid var(--grey)',
+                        borderRadius: '0',
+                        color: 'var(--grey)',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        letterSpacing: '0.05em',
+                        transition: 'border-color 0.2s, color 0.2s',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-color)'; e.currentTarget.style.color = 'var(--text-color)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--grey)'; e.currentTarget.style.color = 'var(--grey)'; }}
+                >
+                    Clear all filters
+                </button>
+            </div>
+        );
+    }
+
     return (
-        <div style={{ padding: '0 40px 100px' }}>
+        <div style={{ padding: '0 40px 100px 0' }}>
             <div
                 ref={gridRef}
                 className={layoutMode === 'grid' ? 'layout-grid-active' : ''}
