@@ -195,7 +195,7 @@ function AppContent() {
           onClose={() => setSelectedPhoto(null)}
           photos={displayPhotos}
           onNavigate={setSelectedPhoto}
-          onSelectFilter={(field, value) => { handleFilterChange(field, value); setActiveGallery(null); }}
+          onSelectFilter={(field, value) => { setActiveFilters({ writer: null, what: null, where: null, [field]: value }); setActiveGallery(null); }}
         />
       </div>
     </>

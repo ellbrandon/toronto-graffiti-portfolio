@@ -96,20 +96,22 @@ const FilterSection = ({ title, icon, options, value, onChange, placeholder, gal
                 {/* {icon && <span className="filter-section-icon">{icon}</span>} */}
                 {title}
             </h3>
-            <SearchableSelect
-                key={value ?? '__empty__'}
-                options={options}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-            />
-            <button
-                className="btn-primary"
-                style={{ opacity: isGalleryOpen ? 0.6 : 1 }}
-                onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
-            >
-                All {title}
-            </button>
+            <div className="filter-section-controls">
+                <SearchableSelect
+                    key={value ?? '__empty__'}
+                    options={options}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                />
+                <button
+                    className="btn-primary"
+                    style={{ opacity: isGalleryOpen ? 0.6 : 1 }}
+                    onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
+                >
+                    All {title}
+                </button>
+            </div>
         </div>
     );
 };
