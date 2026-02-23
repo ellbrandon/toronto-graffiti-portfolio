@@ -89,9 +89,10 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
 
 const FilterSection = ({ title, icon, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
     const isGalleryOpen = activeGallery === galleryKey;
+    const isActive = isGalleryOpen || !!value;
     return (
         <div className="filter-section">
-            <h3 className="filter-section-title">
+            <h3 className={`filter-section-title${isActive ? ' filter-section-title--active' : ''}`}>
                 {/* {icon && <span className="filter-section-icon">{icon}</span>} */}
                 {title}
             </h3>

@@ -272,6 +272,11 @@ h1 {
   align-items: center;
   gap: 6px;
   font-weight: 300;
+  transition: color 0.2s;
+}
+
+.filter-section-title--active {
+  color: var(--theme-text);
 }
 
 .filter-section-icon {
