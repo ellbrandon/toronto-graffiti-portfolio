@@ -43,8 +43,14 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
                                 style={{ objectFit: layoutMode === 'grid' ? 'cover' : 'initial' }}
                             />
                             <div className="overlay">
-                                <p className="overlay-title">{photo.where}</p>
-                                <p className="overlay-subtitle">{photo.writer}</p>
+                                {photo.where || photo.writer ? (
+                                    <>
+                                        <p className="overlay-title">{photo.where}</p>
+                                        <p className="overlay-subtitle">{photo.writer}</p>
+                                    </>
+                                ) : photo.description ? (
+                                    <p className="overlay-title">{photo.description}</p>
+                                ) : null}
                             </div>
                         </div>
                     </div>

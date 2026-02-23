@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
     Sun, Moon, Menu, X,
     LayoutDashboard, LayoutGrid, RectangleVertical, Maximize,
@@ -139,6 +139,7 @@ const Sidebar = ({
     activeGallery, onShowGallery,
 }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const location = useLocation();
 
     const clearAll = () => {
         onWriterChange(null);
@@ -195,6 +196,12 @@ const Sidebar = ({
                         <p className="site-subtitle">ARCHIVE 2010-2025</p>
                     </Link>
                     <nav>{filterSectionEls}</nav>
+                    <Link
+                        to="/places"
+                        className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
+                    >
+                        PLACES &amp; SPACES
+                    </Link>
                 </div>
 
                 <div className="sidebar-options">
@@ -237,6 +244,13 @@ const Sidebar = ({
                 {mobileMenuOpen && (
                     <div className="mobile-menu-panel">
                         {filterSectionEls}
+                        <Link
+                            to="/places"
+                            className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                            PLACES &amp; SPACES
+                        </Link>
                         <div className="mobile-options-row">
                             <button className="btn-icon" onClick={onThemeToggle}>
                                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}

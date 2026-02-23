@@ -3,7 +3,8 @@ import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import PlacesPage from './components/PlacesPage';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { photos } from './data/photos';
 
 const getInitialState = (key, defaultValue) => {
@@ -33,7 +34,8 @@ const applySortValues = (values, sortMode) => {
   }
 };
 
-function App() {
+function AppContent() {
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
   const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
   const [sortMode, setSortMode] = useState(() => getInitialState('sortMode', 'date-desc'));
@@ -92,8 +94,8 @@ function App() {
     setActiveFilters(prev => ({ ...prev, [type]: value === prev[type] ? null : value }));
   };
 
-  const handleGallerySelect = (field, value) => { handleFilterChange(field, value); setActiveGallery(null); };
-  const handleShowGallery   = (field) => setActiveGallery(prev => prev === field ? null : field);
+  const handleGallerySelect = (field, value) => { handleFilterChange(field, value); setActiveGallery(null); navigate('/'); };
+  const handleShowGallery   = (field) => { setActiveGallery(prev => prev === field ? null : field); navigate('/'); };
 
   // Breadcrumb builder
   const buildBreadcrumbs = () => {
@@ -129,7 +131,7 @@ function App() {
   };
 
   return (
-    <Router basename={import.meta.env.BASE_URL}>
+    <>
       <div className="app" data-theme={darkMode ? 'dark' : 'light'}>
         <Sidebar
           darkMode={darkMode}
@@ -140,13 +142,13 @@ function App() {
           onSortToggle={handleSortToggle}
           writers={writers}
           activeWriter={activeFilters.writer}
-          onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); }}
+          onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); navigate('/'); }}
           whats={whats}
           activeWhat={activeFilters.what}
-          onWhatChange={(val) => { handleFilterChange('what', val); setActiveGallery(null); }}
+          onWhatChange={(val) => { handleFilterChange('what', val); setActiveGallery(null); navigate('/'); }}
           wheres={wheres}
           activeWhere={activeFilters.where}
-          onWhereChange={(val) => { handleFilterChange('where', val); setActiveGallery(null); }}
+          onWhereChange={(val) => { handleFilterChange('where', val); setActiveGallery(null); navigate('/'); }}
           activeGallery={activeGallery}
           onShowGallery={handleShowGallery}
         />
@@ -176,6 +178,14 @@ function App() {
                 )}
               </div>
             } />
+            <Route path="/places" element={
+              <div className="route-wrapper">
+                <div className="breadcrumb-bar">
+                  <span className="breadcrumb-text">Places &amp; Spaces</span>
+                </div>
+                <PlacesPage layoutMode={layoutMode} sortMode={sortMode} />
+              </div>
+            } />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
@@ -188,6 +198,14 @@ function App() {
           onSelectFilter={(field, value) => { handleFilterChange(field, value); setActiveGallery(null); }}
         />
       </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router basename={import.meta.env.BASE_URL}>
+      <AppContent />
     </Router>
   );
 }
