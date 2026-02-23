@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
+import WritersGallery from './components/WritersGallery';
 import PhotoModal from './components/PhotoModal';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -48,6 +49,7 @@ function App() {
     writer: null,
   });
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [showWritersGallery, setShowWritersGallery] = useState(false);
 
   // Extract unique filter options
   const writers = useMemo(() => {
@@ -84,7 +86,11 @@ function App() {
           onLayoutToggle={handleLayoutToggle}
           writers={writers}
           activeWriter={activeFilters.writer}
-          onWriterChange={(val) => handleFilterChange('writer', val)}
+          onWriterChange={(val) => { handleFilterChange('writer', val); setShowWritersGallery(false); }}
+          allPhotos={shuffledPhotos}
+          showWritersGallery={showWritersGallery}
+          onShowWritersGallery={() => setShowWritersGallery(true)}
+          onHideWritersGallery={() => setShowWritersGallery(false)}
         />
 
         <main className="main-content" style={{
@@ -101,12 +107,21 @@ function App() {
             <Routes>
               <Route path="/" element={
                 <div style={{ paddingTop: '40px' }}>
-                  <PhotoGrid
-                    photos={filteredPhotos}
-                    onPhotoClick={setSelectedPhoto}
-                    colorMode={true}
-                    layoutMode={layoutMode}
-                  />
+                  {showWritersGallery ? (
+                    <WritersGallery
+                      allPhotos={shuffledPhotos}
+                      writers={writers}
+                      onSelectWriter={(writer) => { handleFilterChange('writer', writer); setShowWritersGallery(false); }}
+                      layoutMode={layoutMode}
+                    />
+                  ) : (
+                    <PhotoGrid
+                      photos={filteredPhotos}
+                      onPhotoClick={setSelectedPhoto}
+                      colorMode={true}
+                      layoutMode={layoutMode}
+                    />
+                  )}
                 </div>
               } />
               <Route path="/about" element={<About darkMode={darkMode} colorMode={true} />} />

@@ -1,6 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize } from 'lucide-react';
+import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize, Search, XCircle } from 'lucide-react';
+
+// Reusable input with optional left/right icon slots
+const IconInput = ({ iconLeft, iconRight, darkMode, active, onClick, children, ...props }) => {
+    const borderColor = darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+    const textColor = darkMode ? 'var(--text-color)' : '#000';
+    return (
+        <div
+            onClick={onClick}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                border: `1px solid ${borderColor}`,
+                borderRadius: '3px',
+                padding: '6px 8px',
+                cursor: 'text',
+                gap: '6px',
+            }}
+        >
+            {iconLeft && (
+                <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'var(--hover-color)' }}>
+                    {iconLeft}
+                </span>
+            )}
+            {children}
+            {iconRight && (
+                <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: 'var(--hover-color)' }}>
+                    {iconRight}
+                </span>
+            )}
+        </div>
+    );
+};
 
 const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) => {
     const [query, setQuery] = useState('');
@@ -32,20 +64,27 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
     };
 
     const textColor = darkMode ? 'var(--text-color)' : '#000';
-    const borderColor = darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
+    const borderColor = darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
     const bgColor = darkMode ? '#111' : '#fff';
+
+    const clearButton = value ? (
+        <button onClick={handleClear} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--hover-color)', padding: 0, display: 'flex', alignItems: 'center'
+        }}>
+            <XCircle size={14} />
+        </button>
+    ) : null;
 
     return (
         <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                border: `1px solid ${value ? textColor : borderColor}`,
-                borderRadius: '3px',
-                padding: '6px 8px',
-                cursor: 'text',
-                gap: '6px',
-            }} onClick={() => { setOpen(true); }}>
+            <IconInput
+                darkMode={darkMode}
+                active={!!value}
+                onClick={() => setOpen(true)}
+                iconLeft={<Search size={14} />}
+                iconRight={clearButton}
+            >
                 <input
                     type="text"
                     value={open ? query : (value || '')}
@@ -60,15 +99,10 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
                         fontSize: '0.8rem',
                         color: value && !open ? textColor : 'var(--hover-color)',
                         cursor: 'text',
+                        minWidth: 0,
                     }}
                 />
-                {value && (
-                    <button onClick={handleClear} style={{
-                        background: 'none', border: 'none', cursor: 'pointer',
-                        color: 'var(--hover-color)', padding: 0, fontSize: '0.9rem', lineHeight: 1
-                    }}>×</button>
-                )}
-            </div>
+            </IconInput>
 
             {open && (
                 <div style={{
@@ -112,7 +146,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
     );
 };
 
-const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers, activeWriter, onWriterChange }) => {
+const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers, activeWriter, onWriterChange, showWritersGallery, onShowWritersGallery, onHideWritersGallery }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -168,7 +202,7 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.1em',
                                 marginBottom: '10px'
-                            }}>Writer</h3>
+                            }}>Writers</h3>
                             <SearchableSelect
                                 options={writers}
                                 value={activeWriter}
@@ -176,6 +210,24 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                                 placeholder="Search writers..."
                                 darkMode={darkMode}
                             />
+                            <button
+                                onClick={showWritersGallery ? onHideWritersGallery : onShowWritersGallery}
+                                style={{
+                                    marginTop: '8px',
+                                    width: '100%',
+                                    padding: '6px 8px',
+                                    background: '#000',
+                                    border: '1px solid #000',
+                                    borderRadius: '3px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    color: '#fff',
+                                    textAlign: 'left',
+                                    transition: 'opacity 0.2s',
+                                }}
+                            >
+                                All Writers
+                            </button>
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -335,6 +387,24 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                                 placeholder="Search writers..."
                                 darkMode={darkMode}
                             />
+                            <button
+                                onClick={showWritersGallery ? onHideWritersGallery : onShowWritersGallery}
+                                style={{
+                                    marginTop: '8px',
+                                    width: '100%',
+                                    padding: '6px 8px',
+                                    background: '#000',
+                                    border: '1px solid #000',
+                                    borderRadius: '3px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    color: '#fff',
+                                    textAlign: 'left',
+                                    transition: 'opacity 0.2s',
+                                }}
+                            >
+                                All Writers
+                            </button>
                         </div>
 
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
