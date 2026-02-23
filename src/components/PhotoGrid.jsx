@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Masonry from 'masonry-layout';
 import imagesLoaded from 'imagesloaded';
 import { Frown } from 'lucide-react';
@@ -6,13 +6,10 @@ import { Frown } from 'lucide-react';
 const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters }) => {
     const gridRef = useRef(null);
     const masonryRef = useRef(null);
-    const [isReady, setIsReady] = useState(false);
 
-    // Initial load/Layout change effect
     useEffect(() => {
         if (!gridRef.current) return;
 
-        // Cleanup function for Masonry
         const cleanupMasonry = () => {
             if (masonryRef.current) {
                 masonryRef.current.destroy();
@@ -21,7 +18,6 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
         };
 
         if (layoutMode === 'masonry') {
-            // Always destroy and recreate so column layout is recalculated fresh
             if (masonryRef.current) {
                 masonryRef.current.destroy();
                 masonryRef.current = null;
@@ -40,16 +36,11 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
 
             const imgLoad = imagesLoaded(gridRef.current);
             imgLoad.on('progress', () => {
-                if (masonryRef.current) {
-                    masonryRef.current.layout();
-                }
+                if (masonryRef.current) masonryRef.current.layout();
             });
 
-            // Safety timeout
             const timeoutId = setTimeout(() => {
-                if (masonryRef.current) {
-                    masonryRef.current.layout();
-                }
+                if (masonryRef.current) masonryRef.current.layout();
             }, 500);
 
             return () => {
@@ -58,20 +49,17 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
             };
 
         } else {
-            // Not masonry mode, ensure masonry is destroyed so CSS Grid/Flex works
             cleanupMasonry();
-            // Reset inline styles left by Masonry
             const items = gridRef.current.querySelectorAll('.grid-item');
             items.forEach(item => {
                 item.style.position = '';
                 item.style.left = '';
                 item.style.top = '';
             });
-            gridRef.current.style.height = ''; // Reset container height set by Masonry
+            gridRef.current.style.height = '';
         }
     }, [photos, layoutMode]);
 
-    // Cleanup on unmount
     useEffect(() => {
         return () => {
             if (masonryRef.current) {
@@ -81,107 +69,16 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
         };
     }, []);
 
-    const getGridStyle = () => {
-        if (layoutMode === 'grid') {
-            return {
-                display: 'grid',
-                // gridTemplateColumns handled by CSS class for responsiveness
-                gap: '20px',
-            };
-        }
-        if (layoutMode === 'single') {
-            return {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '40px',
-                maxWidth: '800px', // Constrain width for single column
-                margin: '0 auto'
-            };
-        }
-        if (layoutMode === 'full') {
-            return {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '40px',
-                width: '100%',
-                margin: '0'
-            };
-        }
-        return {
-            opacity: 1,
-            transition: 'none'
-        }; // Masonry default style
-    };
-
-    const getItemStyle = () => {
-        if (layoutMode === 'grid') {
-            return {
-                width: '100%',
-                marginBottom: 0,
-                position: 'relative',
-                aspectRatio: '1 / 1', // Square aspect ratio
-                overflow: 'hidden'
-            };
-        }
-        if (layoutMode === 'single') {
-            return {
-                width: '100%',
-                marginBottom: 0,
-                position: 'relative',
-            };
-        }
-        if (layoutMode === 'full') {
-            return {
-                width: '100%',
-                marginBottom: 0,
-                position: 'relative',
-            };
-        }
-        return {
-            width: 'calc(33.333% - 14px)',
-            marginBottom: '20px',
-            position: 'relative',
-            overflow: 'hidden'
-        };
-    };
-
     if (photos.length === 0) {
         return (
-            <div style={{
-                height: 'calc(100vh - 120px)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '16px',
-                textAlign: 'center',
-                paddingRight: '40px',
-            }}>
+            <div className="photo-grid-empty">
                 <Frown size={48} strokeWidth={1} style={{ color: 'var(--grey)' }} />
-                <p style={{ fontSize: '1.4rem', fontWeight: '500', color: 'var(--text-color)' }}>
-                    No photos found
-                </p>
-                <p style={{ fontSize: '0.9rem', color: 'var(--grey)', lineHeight: '1.7' }}>
+                <p className="photo-grid-empty-title">No photos found</p>
+                <p className="photo-grid-empty-subtitle">
                     No images match the current filters.<br />
                     Try adjusting your search or clearing a filter.
                 </p>
-                <button
-                    onClick={onClearFilters}
-                    style={{
-                        marginTop: '8px',
-                        padding: '8px 20px',
-                        background: 'none',
-                        border: '1px solid var(--grey)',
-                        borderRadius: '0',
-                        color: 'var(--grey)',
-                        fontSize: '0.8rem',
-                        cursor: 'pointer',
-                        letterSpacing: '0.05em',
-                        transition: 'border-color 0.2s, color 0.2s',
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-color)'; e.currentTarget.style.color = 'var(--text-color)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--grey)'; e.currentTarget.style.color = 'var(--grey)'; }}
-                >
+                <button className="btn-primary" style={{ width: 'auto' }} onClick={onClearFilters}>
                     Clear all filters
                 </button>
             </div>
@@ -189,100 +86,34 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
     }
 
     return (
-        <div style={{ padding: '0 40px 100px 0' }}>
+        <div className="photo-grid-wrapper">
             <div
                 ref={gridRef}
-                className={layoutMode === 'grid' ? 'layout-grid-active' : ''}
-                style={getGridStyle()}
+                className={`layout-${layoutMode}`}
             >
-                {/* Grid sizer for column width (only needed for Masonry) */}
-                {layoutMode === 'masonry' && <div className="grid-sizer" style={{ width: 'calc(33.333% - 14px)' }}></div>}
+                {layoutMode === 'masonry' && <div className="grid-sizer" />}
 
-                {photos.map((photo, index) => (
+                {photos.map((photo) => (
                     <div
                         key={photo.id}
                         className="grid-item"
-                        style={getItemStyle()}
                         onClick={() => onPhotoClick(photo)}
                     >
-                        <div className="img-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
+                        <div className="img-wrapper">
                             <img
                                 src={photo.url}
                                 alt={`${photo.what} at ${photo.where}`}
                                 className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
-                                style={{
-                                    width: '100%',
-                                    height: '100%', // Fill container
-                                    objectFit: layoutMode === 'grid' ? 'cover' : 'block', // Cover for square grid
-                                    display: 'block',
-                                    transformOrigin: 'center'
-                                }}
+                                style={{ objectFit: layoutMode === 'grid' ? 'cover' : 'initial' }}
                             />
-                            <div className="overlay" style={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                padding: '20px',
-                                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
-                                opacity: 0,
-                                transition: 'opacity 0.3s ease',
-                                pointerEvents: 'none'
-                            }}>
-                                <p style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{photo.where}</p>
-                                <p style={{ fontSize: '0.8rem', color: '#ccc' }}>{photo.writer}</p>
+                            <div className="overlay">
+                                <p className="overlay-title">{photo.where}</p>
+                                <p className="overlay-subtitle">{photo.writer}</p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-
-            <style>{`
-        /* Image fade-in effect */
-        .photo-img {
-          opacity: 1;
-          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-          will-change: transform;
-        }
-
-        .color-mode {
-          filter: none;
-        }
-
-        .color-mode:hover {
-          transform: scale(1.05);
-          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-        }
-
-        .img-wrapper:hover .overlay {
-          opacity: 1;
-        }
-
-        /* Grid Layout (Responsive) */
-        .layout-grid-active {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        @media (max-width: 1024px) {
-          .grid-sizer,
-          .grid-item {
-             /* Only override if in masonry mode */
-            ${layoutMode === 'masonry' ? 'width: calc(50% - 10px) !important;' : ''}
-          }
-        }
-
-        @media (max-width: 768px) {
-          .layout-grid-active {
-              grid-template-columns: repeat(2, 1fr);
-          }
-
-          .grid-sizer,
-          .grid-item {
-             /* Only override if in masonry mode */
-            ${layoutMode === 'masonry' ? 'width: calc(50% - 10px) !important;' : ''}
-          }
-        }
-      `}</style>
         </div>
     );
 };

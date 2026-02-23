@@ -23,6 +23,8 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
         if (!gridRef.current) return;
 
         if (layoutMode === 'masonry') {
+            if (masonryRef.current) { masonryRef.current.destroy(); masonryRef.current = null; }
+
             masonryRef.current = new Masonry(gridRef.current, {
                 itemSelector: '.gallery-item',
                 columnWidth: '.gallery-sizer',
@@ -52,7 +54,7 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
             if (masonryRef.current) { masonryRef.current.destroy(); masonryRef.current = null; }
             const items = gridRef.current.querySelectorAll('.gallery-item');
             items.forEach(item => {
-                item.style.position = 'relative';
+                item.style.position = '';
                 item.style.left = '';
                 item.style.top = '';
             });
@@ -60,96 +62,29 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
         }
     }, [cards.length, layoutMode]);
 
-    const getGridStyle = () => {
-        if (layoutMode === 'grid') {
-            return { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' };
-        }
-        if (layoutMode === 'single') {
-            return { display: 'flex', flexDirection: 'column', gap: '40px', maxWidth: '800px', margin: '0 auto' };
-        }
-        if (layoutMode === 'full') {
-            return { display: 'flex', flexDirection: 'column', gap: '40px', width: '100%', margin: '0' };
-        }
-        return {}; // masonry
-    };
-
-    const getItemStyle = () => {
-        if (layoutMode === 'grid') {
-            return { width: '100%', marginBottom: 0, position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden' };
-        }
-        if (layoutMode === 'single' || layoutMode === 'full') {
-            return { width: '100%', marginBottom: 0, position: 'relative', overflow: 'hidden' };
-        }
-        // masonry
-        return { width: 'calc(33.333% - 14px)', marginBottom: '20px', position: 'relative', overflow: 'hidden' };
-    };
-
-    const getImageStyle = () => {
-        const base = { display: 'block', transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)' };
-        if (layoutMode === 'grid') {
-            return { ...base, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' };
-        }
-        return { ...base, width: '100%', height: 'auto' };
-    };
-
     return (
-        <div style={{ padding: '0 40px 100px 0' }}>
+        <div className="allgallery-wrapper">
             <div
                 ref={gridRef}
-                className={layoutMode === 'grid' ? 'allgallery-grid' : ''}
-                style={getGridStyle()}
+                className={`layout-${layoutMode}`}
             >
-                {layoutMode === 'masonry' && (
-                    <div className="gallery-sizer" style={{ width: 'calc(33.333% - 14px)' }} />
-                )}
+                {layoutMode === 'masonry' && <div className="gallery-sizer" />}
 
                 {cards.map(({ value, photo }) => (
                     <div
                         key={value}
                         className="gallery-item"
                         onClick={() => onSelect(value)}
-                        style={{ ...getItemStyle(), cursor: 'pointer', borderRadius: '2px' }}
                     >
-                        <div style={{ position: 'relative', width: '100%', height: layoutMode === 'grid' ? '100%' : 'auto' }}>
-                            <img
-                                src={photo.url}
-                                alt={value}
-                                style={getImageStyle()}
-                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            />
-                            <div style={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                padding: '30px 14px 14px',
-                                background: 'linear-gradient(to top, rgba(0,0,0,0.75), transparent)',
-                                pointerEvents: 'none',
-                            }}>
-                                <p style={{
-                                    fontSize: '0.85rem',
-                                    fontWeight: 'bold',
-                                    color: '#fff',
-                                    letterSpacing: '0.05em',
-                                    textTransform: 'uppercase',
-                                }}>
-                                    {value}
-                                </p>
+                        <div className="gallery-item-inner">
+                            <img src={photo.url} alt={value} />
+                            <div className="gallery-item-overlay">
+                                <p className="gallery-item-label">{value}</p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-
-            <style>{`
-                @media (max-width: 1024px) {
-                    .allgallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
-                }
-                @media (max-width: 600px) {
-                    .allgallery-grid { grid-template-columns: repeat(1, 1fr) !important; }
-                }
-            `}</style>
         </div>
     );
 };
