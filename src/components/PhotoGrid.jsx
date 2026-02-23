@@ -1,73 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import Masonry from 'masonry-layout';
-import imagesLoaded from 'imagesloaded';
+import React from 'react';
 import { Frown } from 'lucide-react';
+import { useLayout } from '../hooks/useLayout';
 
 const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters }) => {
-    const gridRef = useRef(null);
-    const masonryRef = useRef(null);
-
-    useEffect(() => {
-        if (!gridRef.current) return;
-
-        const cleanupMasonry = () => {
-            if (masonryRef.current) {
-                masonryRef.current.destroy();
-                masonryRef.current = null;
-            }
-        };
-
-        if (layoutMode === 'masonry') {
-            if (masonryRef.current) {
-                masonryRef.current.destroy();
-                masonryRef.current = null;
-            }
-
-            masonryRef.current = new Masonry(gridRef.current, {
-                itemSelector: '.grid-item',
-                columnWidth: '.grid-sizer',
-                percentPosition: true,
-                gutter: 20,
-                transitionDuration: 0
-            });
-
-            masonryRef.current.reloadItems();
-            masonryRef.current.layout();
-
-            const imgLoad = imagesLoaded(gridRef.current);
-            imgLoad.on('progress', () => {
-                if (masonryRef.current) masonryRef.current.layout();
-            });
-
-            const timeoutId = setTimeout(() => {
-                if (masonryRef.current) masonryRef.current.layout();
-            }, 500);
-
-            return () => {
-                imgLoad.off('progress');
-                clearTimeout(timeoutId);
-            };
-
-        } else {
-            cleanupMasonry();
-            const items = gridRef.current.querySelectorAll('.grid-item');
-            items.forEach(item => {
-                item.style.position = '';
-                item.style.left = '';
-                item.style.top = '';
-            });
-            gridRef.current.style.height = '';
-        }
-    }, [photos, layoutMode]);
-
-    useEffect(() => {
-        return () => {
-            if (masonryRef.current) {
-                masonryRef.current.destroy();
-                masonryRef.current = null;
-            }
-        };
-    }, []);
+    const gridRef = useLayout('.grid-item', '.grid-sizer', [photos, layoutMode]);
 
     if (photos.length === 0) {
         return (
