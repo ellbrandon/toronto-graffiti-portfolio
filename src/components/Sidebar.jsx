@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize, Search, XCircle } from 'lucide-react';
+import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize, Search, XCircle, Pencil, SprayCan, MapPin } from 'lucide-react';
 
 // Reusable input with optional left/right icon slots
 const IconInput = ({ iconLeft, iconRight, darkMode, onClick, children }) => {
@@ -147,17 +147,23 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
 };
 
 // Reusable filter section: title + search + "All X" button
-const FilterSection = ({ title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll, darkMode }) => {
+const FilterSection = ({ title, icon, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll, darkMode }) => {
     const isGalleryOpen = activeGallery === galleryKey;
     return (
         <div style={{ marginBottom: '30px' }}>
             <h3 style={{
-                fontSize: '0.7rem',
+                fontSize: '.9rem',
                 color: 'var(--grey)',
-                textTransform: 'uppercase',
+                // textTransform: 'uppercase',
                 letterSpacing: '0.1em',
-                marginBottom: '10px'
-            }}>{title}</h3>
+                marginBottom: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+            }}>
+                {icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
+                {title}
+            </h3>
             <SearchableSelect
                 key={value ?? '__empty__'}
                 options={options}
@@ -205,9 +211,9 @@ const Sidebar = ({
     };
 
     const filterSections = [
-        { title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
-        { title: 'What',    options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
-        { title: 'Where',   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
+        { title: 'Writers', icon: <Pencil size={18} />,   options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
+        { title: 'What',    icon: <SprayCan size={18} />, options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
+        { title: 'Where',   icon: <MapPin size={18} />,   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
     ];
 
     const layoutIcons = {
@@ -267,6 +273,7 @@ const Sidebar = ({
                             <FilterSection
                                 key={s.galleryKey}
                                 title={s.title}
+                                icon={s.icon}
                                 options={s.options}
                                 value={s.value}
                                 onChange={s.onChange}
@@ -372,6 +379,7 @@ const Sidebar = ({
                             <FilterSection
                                 key={s.galleryKey}
                                 title={s.title}
+                                icon={s.icon}
                                 options={s.options}
                                 value={s.value}
                                 onChange={s.onChange}

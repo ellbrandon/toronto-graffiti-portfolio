@@ -195,6 +195,7 @@ function App() {
           onClose={() => setSelectedPhoto(null)}
           photos={filteredPhotos}
           onNavigate={setSelectedPhoto}
+          onSelectFilter={(field, value) => { handleFilterChange(field, value); setActiveGallery(null); }}
         />
 
         <style>{`

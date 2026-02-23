@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const PhotoModal = ({ photo, onClose, photos = [], onNavigate }) => {
+const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter }) => {
     useEffect(() => {
         if (!photo) return;
 
@@ -161,11 +161,32 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate }) => {
                         boxShadow: '0 0 50px rgba(0,0,0,0.5)'
                     }}
                 />
-                <div style={{ textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '5px' }}>{photo.where}</h2>
-                    <p style={{ color: '#888' }}>
-                        <span style={{ color: '#fff' }}>{photo.writer}</span> • {photo.what}
-                    </p>
+                <div style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {[
+                        { field: 'writer', value: photo.writer },
+                        { field: 'what',   value: photo.what },
+                        { field: 'where',  value: photo.where },
+                    ].map(({ field, value }) => (
+                        <button
+                            key={field}
+                            onClick={() => { onSelectFilter(field, value); onClose(); }}
+                            style={{
+                                background: 'rgba(255,255,255,0.08)',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '3px',
+                                color: '#fff',
+                                fontSize: '0.8rem',
+                                padding: '5px 12px',
+                                cursor: 'pointer',
+                                letterSpacing: '0.05em',
+                                transition: 'background 0.2s',
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                        >
+                            {value}
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>
