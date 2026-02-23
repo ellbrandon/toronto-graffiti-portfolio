@@ -114,7 +114,9 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
                     maxHeight: '180px',
                     overflowY: 'auto',
                     zIndex: 500,
-                }}>
+                }}
+                className="searchable-dropdown"
+            >
                     {filtered.length === 0 ? (
                         <div style={{ padding: '8px', fontSize: '0.8rem', color: 'var(--hover-color)' }}>No matches</div>
                     ) : filtered.map(option => (
@@ -277,28 +279,6 @@ const Sidebar = ({
                             />
                         ))}
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <Link to="/about" style={{
-                                fontSize: '0.9rem',
-                                color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                                transition: 'color 0.3s',
-                                textDecoration: 'none'
-                            }}>
-                                About
-                            </Link>
-                            <span style={{
-                                fontSize: '0.9rem',
-                                color: darkMode ? 'var(--grey)' : 'var(--dark-grey)'
-                            }}>/</span>
-                            <Link to="/contact" style={{
-                                fontSize: '0.9rem',
-                                color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                                transition: 'color 0.3s',
-                                textDecoration: 'none'
-                            }}>
-                                Contact
-                            </Link>
-                        </div>
                     </nav>
                 </div>
 
@@ -404,11 +384,6 @@ const Sidebar = ({
                             />
                         ))}
 
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
-                            <Link to="/about" style={{ fontSize: '0.9rem', color: darkMode ? 'var(--text-color)' : '#000', textDecoration: 'none' }}>About</Link>
-                            <span style={{ color: 'var(--grey)' }}>/</span>
-                            <Link to="/contact" style={{ fontSize: '0.9rem', color: darkMode ? 'var(--text-color)' : '#000', textDecoration: 'none' }}>Contact</Link>
-                        </div>
                         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                             <button onClick={onThemeToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: darkMode ? 'var(--text-color)' : '#000', display: 'flex', alignItems: 'center', padding: 0 }}>
                                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -429,6 +404,7 @@ const Sidebar = ({
                 @media (min-width: 769px) {
                     .mobile-header { display: none !important; }
                 }
+
             `}</style>
         </>
     );

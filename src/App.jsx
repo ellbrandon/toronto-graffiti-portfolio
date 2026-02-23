@@ -3,20 +3,11 @@ import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
-import About from './pages/About';
-import Contact from './pages/Contact';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { photos } from './data/photos';
 
-// Shuffle function
-const shuffleArray = (array) => {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-};
+const sortByNewest = (array) =>
+  [...array].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
 
 const getInitialState = (key, defaultValue) => {
   const saved = localStorage.getItem(key);
@@ -44,7 +35,7 @@ function App() {
     setLayoutMode(modes[nextIndex]);
   };
 
-  const [shuffledPhotos] = useState(() => shuffleArray(photos));
+  const [sortedPhotos] = useState(() => sortByNewest(photos));
 
   const [activeFilters, setActiveFilters] = useState({
     writer: null,
@@ -58,18 +49,18 @@ function App() {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   // Unique sorted values for each field
-  const writers = useMemo(() => [...new Set(shuffledPhotos.map(p => p.writer))].sort(), [shuffledPhotos]);
-  const whats   = useMemo(() => [...new Set(shuffledPhotos.map(p => p.what))].sort(),   [shuffledPhotos]);
-  const wheres  = useMemo(() => [...new Set(shuffledPhotos.map(p => p.where))].sort(),  [shuffledPhotos]);
+  const writers = useMemo(() => [...new Set(sortedPhotos.map(p => p.writer))].sort(), [sortedPhotos]);
+  const whats   = useMemo(() => [...new Set(sortedPhotos.map(p => p.what))].sort(),   [sortedPhotos]);
+  const wheres  = useMemo(() => [...new Set(sortedPhotos.map(p => p.where))].sort(),  [sortedPhotos]);
 
   const filteredPhotos = useMemo(() => {
-    return shuffledPhotos.filter(photo => {
+    return sortedPhotos.filter(photo => {
       if (activeFilters.writer && photo.writer !== activeFilters.writer) return false;
       if (activeFilters.what   && photo.what   !== activeFilters.what)   return false;
       if (activeFilters.where  && photo.where  !== activeFilters.where)  return false;
       return true;
     });
-  }, [shuffledPhotos, activeFilters]);
+  }, [sortedPhotos, activeFilters]);
 
   const handleFilterChange = (type, value) => {
     setActiveFilters(prev => ({
@@ -144,12 +135,12 @@ function App() {
                     const hasAnything = activeGallery || activeFilters.writer || activeFilters.what || activeFilters.where;
                     crumbs.push(
                       hasAnything
-                        ? <button key="root" style={linkStyle} onClick={() => { setActiveFilters({ writer: null, what: null, where: null }); setActiveGallery(null); }}>All Photos</button>
-                        : <span key="root" style={crumbStyle}>All Photos</span>
+                        ? <button key="root" style={linkStyle} onClick={() => { setActiveFilters({ writer: null, what: null, where: null }); setActiveGallery(null); }}>All Graff</button>
+                        : <span key="root" style={crumbStyle}>All Graff</span>
                     );
 
                     if (activeGallery) {
-                      // e.g. All Photos > Writers
+                      // e.g. All Graff > Writers
                       const label = activeGallery === 'writer' ? 'Writers' : activeGallery === 'what' ? 'What' : 'Where';
                       crumbs.push(<span key="sep1" style={sepStyle}>/</span>);
                       crumbs.push(<span key="gallery" style={crumbStyle}>{label}</span>);
@@ -180,7 +171,7 @@ function App() {
 
                   {activeGallery ? (
                     <AllGallery
-                      allPhotos={shuffledPhotos}
+                      allPhotos={sortedPhotos}
                       field={galleryConfig[activeGallery].field}
                       values={galleryConfig[activeGallery].values}
                       onSelect={(value) => handleGallerySelect(activeGallery, value)}
@@ -196,8 +187,6 @@ function App() {
                   )}
                 </div>
               } />
-              <Route path="/about" element={<About darkMode={darkMode} colorMode={true} />} />
-              <Route path="/contact" element={<Contact darkMode={darkMode} colorMode={true} />} />
           </Routes>
         </main>
 
