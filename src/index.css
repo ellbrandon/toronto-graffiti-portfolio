@@ -792,6 +792,9 @@ body.magic-cursor-enabled .grid-item {
   .layout-masonry .grid-item,
   .layout-masonry .gallery-sizer,
   .layout-masonry .gallery-item { width: calc(50% - 10px); }
+  .photo-grid-wrapper,
+  .allgallery-wrapper { padding-left: 40px; }
+  .breadcrumb-bar { padding-left: 40px; }
 }
 
 @media (min-width: 769px) {

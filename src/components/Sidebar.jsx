@@ -87,7 +87,7 @@ const FilterSection = ({ title, icon, options, value, onChange, placeholder, gal
     return (
         <div className="filter-section">
             <h3 className="filter-section-title">
-                {icon && <span className="filter-section-icon">{icon}</span>}
+                {/* {icon && <span className="filter-section-icon">{icon}</span>} */}
                 {title}
             </h3>
             <SearchableSelect
