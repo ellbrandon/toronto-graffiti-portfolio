@@ -13,7 +13,8 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
         photo: allPhotos.find(p => p[field] === value),
     })).filter(c => c.photo);
 
-    const gridRef = useLayout('.gallery-item', '.gallery-sizer', [cards.length, layoutMode]);
+    // Include the first value in deps so reordering (alpha/random) triggers a re-layout
+    const gridRef = useLayout('.gallery-item', '.gallery-sizer', [cards.length, cards[0]?.value, layoutMode]);
 
     return (
         <div className="allgallery-wrapper">

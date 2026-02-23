@@ -6,43 +6,85 @@ import PhotoModal from './components/PhotoModal';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { photos } from './data/photos';
 
-const sortByNewest = (array) =>
-  [...array].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
-
 const getInitialState = (key, defaultValue) => {
   const saved = localStorage.getItem(key);
   if (saved !== null) return JSON.parse(saved);
   return defaultValue;
 };
 
+// Ordered cycle of sort modes
+const SORT_MODES = ['date-desc', 'date-asc', 'alpha-asc', 'alpha-desc', 'random'];
+
+const applySort = (array, sortMode) => {
+  switch (sortMode) {
+    case 'date-asc':   return [...array].sort((a, b) => new Date(a.uploaded) - new Date(b.uploaded));
+    case 'alpha-asc':  return [...array].sort((a, b) => a.writer.localeCompare(b.writer));
+    case 'alpha-desc': return [...array].sort((a, b) => b.writer.localeCompare(a.writer));
+    case 'random':     return [...array].sort(() => Math.random() - 0.5);
+    default:           return [...array].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
+  }
+};
+
+const applySortValues = (values, sortMode) => {
+  switch (sortMode) {
+    case 'alpha-desc': return [...values].sort((a, b) => b.localeCompare(a));
+    case 'random':     return [...values].sort(() => Math.random() - 0.5);
+    default:           return [...values].sort((a, b) => a.localeCompare(b));
+  }
+};
+
 function App() {
   const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
   const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
+  const [sortMode, setSortMode] = useState(() => getInitialState('sortMode', 'date-desc'));
 
   useEffect(() => { localStorage.setItem('darkMode', JSON.stringify(darkMode)); }, [darkMode]);
   useEffect(() => { localStorage.setItem('layoutMode', JSON.stringify(layoutMode)); }, [layoutMode]);
+  useEffect(() => { localStorage.setItem('sortMode', JSON.stringify(sortMode)); }, [sortMode]);
 
   const handleLayoutToggle = () => {
     const modes = ['masonry', 'grid', 'single', 'full'];
     setLayoutMode(modes[(modes.indexOf(layoutMode) + 1) % modes.length]);
   };
 
-  const [sortedPhotos] = useState(() => sortByNewest(photos));
+  const handleSortToggle = () => {
+    setSortMode(SORT_MODES[(SORT_MODES.indexOf(sortMode) + 1) % SORT_MODES.length]);
+  };
+
+  const basePhotos = useMemo(() => [...photos], []);
 
   const [activeFilters, setActiveFilters] = useState({ writer: null, what: null, where: null });
   const [activeGallery, setActiveGallery] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  const writers = useMemo(() => [...new Set(sortedPhotos.map(p => p.writer))].sort(), [sortedPhotos]);
-  const whats   = useMemo(() => [...new Set(sortedPhotos.map(p => p.what))].sort(),   [sortedPhotos]);
-  const wheres  = useMemo(() => [...new Set(sortedPhotos.map(p => p.where))].sort(),  [sortedPhotos]);
+  // All unique filter values — always alpha sorted for the sidebar dropdowns
+  const writers = useMemo(() => [...new Set(basePhotos.map(p => p.writer))].sort(), [basePhotos]);
+  const whats   = useMemo(() => [...new Set(basePhotos.map(p => p.what))].sort(),   [basePhotos]);
+  const wheres  = useMemo(() => [...new Set(basePhotos.map(p => p.where))].sort(),  [basePhotos]);
 
-  const filteredPhotos = useMemo(() => sortedPhotos.filter(photo => {
-    if (activeFilters.writer && photo.writer !== activeFilters.writer) return false;
-    if (activeFilters.what   && photo.what   !== activeFilters.what)   return false;
-    if (activeFilters.where  && photo.where  !== activeFilters.where)  return false;
-    return true;
-  }), [sortedPhotos, activeFilters]);
+  // Filtered then sorted photo list for PhotoGrid
+  const displayPhotos = useMemo(() => {
+    const filtered = basePhotos.filter(photo => {
+      if (activeFilters.writer && photo.writer !== activeFilters.writer) return false;
+      if (activeFilters.what   && photo.what   !== activeFilters.what)   return false;
+      if (activeFilters.where  && photo.where  !== activeFilters.where)  return false;
+      return true;
+    });
+    return applySort(filtered, sortMode);
+  }, [basePhotos, activeFilters, sortMode]);
+
+  // Sorted values for AllGallery cards — memoised so random only shuffles on sortMode change
+  const gallerySortedValues = useMemo(() => ({
+    writer: applySortValues(writers, sortMode),
+    what:   applySortValues(whats,   sortMode),
+    where:  applySortValues(wheres,  sortMode),
+  }), [writers, whats, wheres, sortMode]);
+
+  const galleryConfig = {
+    writer: { field: 'writer', values: gallerySortedValues.writer },
+    what:   { field: 'what',   values: gallerySortedValues.what },
+    where:  { field: 'where',  values: gallerySortedValues.where },
+  };
 
   const clearAllFilters = () => setActiveFilters({ writer: null, what: null, where: null });
 
@@ -52,12 +94,6 @@ function App() {
 
   const handleGallerySelect = (field, value) => { handleFilterChange(field, value); setActiveGallery(null); };
   const handleShowGallery   = (field) => setActiveGallery(prev => prev === field ? null : field);
-
-  const galleryConfig = {
-    writer: { field: 'writer', values: writers },
-    what:   { field: 'what',   values: whats },
-    where:  { field: 'where',  values: wheres },
-  };
 
   // Breadcrumb builder
   const buildBreadcrumbs = () => {
@@ -100,6 +136,8 @@ function App() {
           onThemeToggle={() => setDarkMode(!darkMode)}
           layoutMode={layoutMode}
           onLayoutToggle={handleLayoutToggle}
+          sortMode={sortMode}
+          onSortToggle={handleSortToggle}
           writers={writers}
           activeWriter={activeFilters.writer}
           onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); }}
@@ -121,7 +159,7 @@ function App() {
 
                 {activeGallery ? (
                   <AllGallery
-                    allPhotos={sortedPhotos}
+                    allPhotos={basePhotos}
                     field={galleryConfig[activeGallery].field}
                     values={galleryConfig[activeGallery].values}
                     onSelect={(value) => handleGallerySelect(activeGallery, value)}
@@ -129,7 +167,7 @@ function App() {
                   />
                 ) : (
                   <PhotoGrid
-                    photos={filteredPhotos}
+                    photos={displayPhotos}
                     onPhotoClick={setSelectedPhoto}
                     colorMode={true}
                     layoutMode={layoutMode}
@@ -145,7 +183,7 @@ function App() {
         <PhotoModal
           photo={selectedPhoto}
           onClose={() => setSelectedPhoto(null)}
-          photos={filteredPhotos}
+          photos={displayPhotos}
           onNavigate={setSelectedPhoto}
           onSelectFilter={(field, value) => { handleFilterChange(field, value); setActiveGallery(null); }}
         />

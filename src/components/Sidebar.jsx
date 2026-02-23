@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize, Search, XCircle, Pencil, SprayCan, MapPin } from 'lucide-react';
+import {
+    Sun, Moon, Menu, X,
+    LayoutDashboard, LayoutGrid, RectangleVertical, Maximize,
+    Search, XCircle, Pencil, SprayCan, MapPin,
+    CalendarArrowDown, CalendarArrowUp, ArrowDownAZ, ArrowUpAZ, Dices,
+} from 'lucide-react';
 
 // Reusable input with optional left/right icon slots
 const IconInput = ({ iconLeft, iconRight, onClick, children }) => (
@@ -108,8 +113,26 @@ const FilterSection = ({ title, icon, options, value, onChange, placeholder, gal
     );
 };
 
+const sortIcons = {
+    'date-desc': <CalendarArrowDown size={20} />,
+    'date-asc':  <CalendarArrowUp size={20} />,
+    'alpha-asc': <ArrowDownAZ size={20} />,
+    'alpha-desc':<ArrowUpAZ size={20} />,
+    'random':    <Dices size={20} />,
+
+    
+};
+
+const sortTitles = {
+    'date-desc': 'Newest first',
+    'date-asc':  'Oldest first',
+    'alpha-asc': 'A → Z',
+    'alpha-desc':'Z → A',
+    'random':    'Random order',
+};
+
 const Sidebar = ({
-    darkMode, onThemeToggle, layoutMode, onLayoutToggle,
+    darkMode, onThemeToggle, layoutMode, onLayoutToggle, sortMode, onSortToggle,
     writers, activeWriter, onWriterChange,
     whats, activeWhat, onWhatChange,
     wheres, activeWhere, onWhereChange,
@@ -152,6 +175,16 @@ const Sidebar = ({
         />
     ));
 
+    const sortBtn = (
+        <button
+            className="btn-icon"
+            onClick={onSortToggle}
+            title={sortTitles[sortMode]}
+        >
+            {sortIcons[sortMode]}
+        </button>
+    );
+
     return (
         <>
             {/* Desktop Sidebar */}
@@ -181,6 +214,7 @@ const Sidebar = ({
                         >
                             {layoutIcons[layoutMode]}
                         </button>
+                        {sortBtn}
                     </div>
                     <p className="sidebar-copyright">
                         &copy; {new Date().getFullYear()}<br />
@@ -210,6 +244,7 @@ const Sidebar = ({
                             <button className="btn-icon" onClick={onLayoutToggle}>
                                 {layoutIcons[layoutMode]}
                             </button>
+                            {sortBtn}
                         </div>
                     </div>
                 )}
