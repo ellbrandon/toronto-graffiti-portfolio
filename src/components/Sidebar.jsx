@@ -145,7 +145,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
 };
 
 // Reusable filter section: title + search + "All X" button
-const FilterSection = ({ title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, darkMode }) => {
+const FilterSection = ({ title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll, darkMode }) => {
     const isGalleryOpen = activeGallery === galleryKey;
     return (
         <div style={{ marginBottom: '30px' }}>
@@ -157,6 +157,7 @@ const FilterSection = ({ title, options, value, onChange, placeholder, galleryKe
                 marginBottom: '10px'
             }}>{title}</h3>
             <SearchableSelect
+                key={value ?? '__empty__'}
                 options={options}
                 value={value}
                 onChange={onChange}
@@ -164,7 +165,7 @@ const FilterSection = ({ title, options, value, onChange, placeholder, galleryKe
                 darkMode={darkMode}
             />
             <button
-                onClick={() => onShowGallery(galleryKey)}
+                onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
                 style={{
                     marginTop: '8px',
                     width: '100%',
@@ -194,6 +195,12 @@ const Sidebar = ({
     activeGallery, onShowGallery,
 }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const clearAll = () => {
+        onWriterChange(null);
+        onWhatChange(null);
+        onWhereChange(null);
+    };
 
     const filterSections = [
         { title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
@@ -265,6 +272,7 @@ const Sidebar = ({
                                 galleryKey={s.galleryKey}
                                 activeGallery={activeGallery}
                                 onShowGallery={onShowGallery}
+                                onClearAll={clearAll}
                                 darkMode={darkMode}
                             />
                         ))}
@@ -391,6 +399,7 @@ const Sidebar = ({
                                 galleryKey={s.galleryKey}
                                 activeGallery={activeGallery}
                                 onShowGallery={onShowGallery}
+                                onClearAll={clearAll}
                                 darkMode={darkMode}
                             />
                         ))}
