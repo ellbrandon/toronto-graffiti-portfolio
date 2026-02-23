@@ -1,234 +1,109 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Sun, Moon, Menu, X, ChevronDown, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize } from 'lucide-react';
+import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize } from 'lucide-react';
 
-const FilterSection = ({ title, items, activeItem, onItemClick, itemsPerPage = 3, darkMode }) => {
-    const [page, setPage] = useState(0);
-    const totalPages = Math.ceil(items.length / itemsPerPage);
+const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) => {
+    const [query, setQuery] = useState('');
+    const [open, setOpen] = useState(false);
+    const containerRef = useRef(null);
 
-    const displayedItems = items.slice(
-        page * itemsPerPage,
-        (page + 1) * itemsPerPage
-    );
+    const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase()));
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (containerRef.current && !containerRef.current.contains(e.target)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const handleSelect = (option) => {
+        onChange(option === value ? null : option);
+        setQuery('');
+        setOpen(false);
+    };
+
+    const handleClear = (e) => {
+        e.stopPropagation();
+        onChange(null);
+        setQuery('');
+    };
+
+    const textColor = darkMode ? 'var(--text-color)' : '#000';
+    const borderColor = darkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
+    const bgColor = darkMode ? '#111' : '#fff';
 
     return (
-        <div style={{ marginBottom: '30px' }}>
+        <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
             <div style={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '15px'
-            }}>
-                <h3 style={{
-                    fontSize: '0.7rem',
-                    color: 'var(--grey)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em'
-                }}>
-                    {title}
-                </h3>
-
-                {/* Pagination Controls in Header */}
-                {totalPages > 1 && (
-                    <div style={{
-                        display: 'flex',
-                        gap: '10px',
-                        color: 'var(--grey)'
-                    }}>
-                        <button
-                            onClick={() => setPage(p => Math.max(0, p - 1))}
-                            disabled={page === 0}
-                            style={{
-                                opacity: page === 0 ? 0.3 : 1,
-                                cursor: page === 0 ? 'default' : 'pointer',
-                                display: 'flex', alignItems: 'center',
-                                padding: '0'
-                            }}
-                        >
-                            <ChevronLeft size={14} />
-                        </button>
-                        <button
-                            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                            disabled={page === totalPages - 1}
-                            style={{
-                                opacity: page === totalPages - 1 ? 0.3 : 1,
-                                cursor: page === totalPages - 1 ? 'default' : 'pointer',
-                                display: 'flex', alignItems: 'center',
-                                padding: '0'
-                            }}
-                        >
-                            <ChevronRight size={14} />
-                        </button>
-                    </div>
+                border: `1px solid ${value ? textColor : borderColor}`,
+                borderRadius: '3px',
+                padding: '6px 8px',
+                cursor: 'text',
+                gap: '6px',
+            }} onClick={() => { setOpen(true); }}>
+                <input
+                    type="text"
+                    value={open ? query : (value || '')}
+                    onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+                    onFocus={() => setOpen(true)}
+                    placeholder={placeholder}
+                    style={{
+                        flex: 1,
+                        background: 'none',
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '0.8rem',
+                        color: value && !open ? textColor : 'var(--hover-color)',
+                        cursor: 'text',
+                    }}
+                />
+                {value && (
+                    <button onClick={handleClear} style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: 'var(--hover-color)', padding: 0, fontSize: '0.9rem', lineHeight: 1
+                    }}>×</button>
                 )}
             </div>
 
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <li>
-                    <button
-                        onClick={() => onItemClick(null)}
-                        style={{
-                            fontSize: '0.9rem',
-                            color: !activeItem
-                                ? (darkMode ? 'var(--text-color)' : 'var(--text-color-dark)')
-                                : 'var(--hover-color)',
-                            fontWeight: !activeItem ? 'bold' : 'normal',
-                            textAlign: 'left',
-                            transition: 'color 0.3s, transform 0.3s',
-                            transform: 'translateX(0)',
-                            display: 'block',
-                            width: '100%',
-                            background: 'none',
-                            border: 'none',
-                            padding: 0,
-                            cursor: 'pointer'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (activeItem) { // Only animate if not active
-                                e.currentTarget.style.color = darkMode ? 'var(--text-color)' : 'var(--text-color-dark)';
-                                e.currentTarget.style.transform = 'translateX(5px)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (activeItem) {
-                                e.currentTarget.style.color = 'var(--hover-color)';
-                                e.currentTarget.style.transform = 'translateX(0)';
-                            }
-                        }}
-                    >
-                        All
-                    </button>
-                </li>
-                {displayedItems.map(item => (
-                    <li key={item}>
-                        <button
-                            onClick={() => onItemClick(item)}
-                            style={{
-                                fontSize: '0.9rem',
-                                color: activeItem === item ? (darkMode ? 'var(--text-color)' : '#000000') : 'var(--hover-color)',
-                                fontWeight: activeItem === item ? 'bold' : 'normal',
-                                textAlign: 'left',
-                                transition: 'color 0.3s, transform 0.3s',
-                                transform: 'translateX(0)',
-                                display: 'block',
-                                width: '100%',
-                                background: 'none',
-                                border: 'none',
-                                padding: 0,
-                                cursor: 'pointer'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (activeItem !== item) {
-                                    e.currentTarget.style.color = darkMode ? 'var(--text-color)' : 'var(--text-color-dark)';
-                                    e.currentTarget.style.transform = 'translateX(5px)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (activeItem !== item) {
-                                    e.currentTarget.style.color = 'var(--hover-color)';
-                                    e.currentTarget.style.transform = 'translateX(0)';
-                                }
-                            }}
-                        >
-                            {item}
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
-};
-
-const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div style={{ position: 'relative', flex: 1 }}>
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    backgroundColor: darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
-                    color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                }}
-            >
-                <span>{activeItem || title}</span>
-                <ChevronDown size={14} style={{
-                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s'
-                }} />
-            </button>
-
-            {isOpen && (
+            {open && (
                 <div style={{
                     position: 'absolute',
-                    top: '100%',
+                    top: 'calc(100% + 4px)',
                     left: 0,
                     right: 0,
-                    marginTop: '4px',
-                    backgroundColor: darkMode ? 'var(--bg-color)' : '#ffffff',
-                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                    borderRadius: '4px',
-                    maxHeight: '200px',
+                    backgroundColor: bgColor,
+                    border: `1px solid ${borderColor}`,
+                    borderRadius: '3px',
+                    maxHeight: '180px',
                     overflowY: 'auto',
-                    zIndex: 1000,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                    zIndex: 500,
                 }}>
-                    <button
-                        onClick={() => {
-                            onItemClick(null);
-                            setIsOpen(false);
-                        }}
-                        style={{
-                            width: '100%',
-                            padding: '8px 12px',
-                            border: 'none',
-                            background: 'none',
-                            textAlign: 'left',
-                            fontSize: '0.8rem',
-                            color: !activeItem ? (darkMode ? 'var(--text-color)' : 'var(--text-color-dark)') : 'var(--hover-color)',
-                            fontWeight: !activeItem ? 'bold' : 'normal',
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                        All
-                    </button>
-                    {items.map(item => (
+                    {filtered.length === 0 ? (
+                        <div style={{ padding: '8px', fontSize: '0.8rem', color: 'var(--hover-color)' }}>No matches</div>
+                    ) : filtered.map(option => (
                         <button
-                            key={item}
-                            onClick={() => {
-                                onItemClick(item);
-                                setIsOpen(false);
-                            }}
+                            key={option}
+                            onClick={() => handleSelect(option)}
                             style={{
+                                display: 'block',
                                 width: '100%',
-                                padding: '8px 12px',
-                                border: 'none',
-                                background: 'none',
                                 textAlign: 'left',
+                                padding: '7px 10px',
+                                background: option === value ? (darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)') : 'none',
+                                border: 'none',
                                 fontSize: '0.8rem',
-                                color: activeItem === item ? (darkMode ? 'var(--text-color)' : 'var(--text-color-dark)') : 'var(--hover-color)',
-                                fontWeight: activeItem === item ? 'bold' : 'normal',
+                                color: option === value ? textColor : 'var(--hover-color)',
                                 cursor: 'pointer',
-                                transition: 'background-color 0.2s'
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = option === value ? (darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)') : 'transparent'}
                         >
-                            {item}
+                            {option}
                         </button>
                     ))}
                 </div>
@@ -237,9 +112,7 @@ const MobileDropdown = ({ title, items, activeItem, onItemClick, darkMode }) => 
     );
 };
 
-const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeToggle, layoutMode, onLayoutToggle }) => {
-    const location = useLocation();
-    const showFilters = location.pathname === '/';
+const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers, activeWriter, onWriterChange }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -263,19 +136,8 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 <div>
                     <Link
                         to="/"
-                        onClick={() => {
-                            onFilterChange('style', null);
-                            onFilterChange('location', null);
-                            onFilterChange('author', null);
-                        }}
                         style={{
                             marginBottom: '40px',
-                            background: 'none',
-                            border: 'none',
-                            padding: 0,
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            width: '100%',
                             display: 'block',
                             textDecoration: 'none',
                             color: darkMode ? 'var(--text-color)' : '#000'
@@ -299,46 +161,28 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                     </Link>
 
                     <nav>
-                        {showFilters && (
-                            <>
-                                <FilterSection
-                                    title="Styles"
-                                    items={filters.styles}
-                                    activeItem={activeFilters.style}
-                                    onItemClick={(val) => onFilterChange('style', val)}
-                                    itemsPerPage={4}
-                                    darkMode={darkMode}
-                                />
+                        <div style={{ marginBottom: '30px' }}>
+                            <h3 style={{
+                                fontSize: '0.7rem',
+                                color: 'var(--grey)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                marginBottom: '10px'
+                            }}>Writer</h3>
+                            <SearchableSelect
+                                options={writers}
+                                value={activeWriter}
+                                onChange={onWriterChange}
+                                placeholder="Search writers..."
+                                darkMode={darkMode}
+                            />
+                        </div>
 
-                                <FilterSection
-                                    title="Locations"
-                                    items={filters.locations}
-                                    activeItem={activeFilters.location}
-                                    onItemClick={(val) => onFilterChange('location', val)}
-                                    itemsPerPage={4}
-                                    darkMode={darkMode}
-                                />
-
-                                <FilterSection
-                                    title="Artists"
-                                    items={filters.authors}
-                                    activeItem={activeFilters.author}
-                                    onItemClick={(val) => onFilterChange('author', val)}
-                                    itemsPerPage={4}
-                                    darkMode={darkMode}
-                                />
-                            </>
-                        )}
-
-                        <div style={{ marginTop: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <Link to="/about" style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                                textAlign: 'left',
                                 transition: 'color 0.3s',
-                                background: 'none',
-                                border: 'none',
-                                padding: 0,
                                 textDecoration: 'none'
                             }}>
                                 About
@@ -350,11 +194,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             <Link to="/contact" style={{
                                 fontSize: '0.9rem',
                                 color: darkMode ? 'var(--text-color)' : 'var(--text-color-dark)',
-                                textAlign: 'left',
                                 transition: 'color 0.3s',
-                                background: 'none',
-                                border: 'none',
-                                padding: 0,
                                 textDecoration: 'none'
                             }}>
                                 Contact
@@ -374,7 +214,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                         Options
                     </h3>
                     <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '20px' }}>
-                        {/* Theme Toggle */}
                         <button
                             onClick={onThemeToggle}
                             style={{
@@ -394,7 +233,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
 
-                        {/* Layout Toggle */}
                         <button
                             onClick={onLayoutToggle}
                             style={{
@@ -405,7 +243,7 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                                 display: 'flex',
                                 alignItems: 'center',
                                 padding: 0,
-                                transition: 'transform 0.2s, color 0.3s'
+                                transition: 'transform 0.2s'
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -442,21 +280,10 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 zIndex: 200,
                 transition: 'background-color 0.3s'
             }}>
-                {/* Top row: Logo and Menu */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Link
                         to="/"
-                        onClick={() => {
-                            onFilterChange('style', null);
-                            onFilterChange('location', null);
-                            onFilterChange('author', null);
-                        }}
                         style={{
-                            background: 'none',
-                            border: 'none',
-                            padding: 0,
-                            cursor: 'pointer',
-                            textAlign: 'left',
                             textDecoration: 'none',
                             color: darkMode ? 'var(--text-color)' : '#000'
                         }}
@@ -487,53 +314,43 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                     </button>
                 </div>
 
-                {/* Filter dropdowns */}
-                {showFilters && (
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                        <MobileDropdown
-                            title="Styles"
-                            items={filters.styles}
-                            activeItem={activeFilters.style}
-                            onItemClick={(val) => onFilterChange('style', val)}
-                            darkMode={darkMode}
-                        />
-                        <MobileDropdown
-                            title="Locations"
-                            items={filters.locations}
-                            activeItem={activeFilters.location}
-                            onItemClick={(val) => onFilterChange('location', val)}
-                            darkMode={darkMode}
-                        />
-                        <MobileDropdown
-                            title="Artists"
-                            items={filters.authors}
-                            activeItem={activeFilters.author}
-                            onItemClick={(val) => onFilterChange('author', val)}
-                            darkMode={darkMode}
-                        />
-                    </div>
-                )}
-
-                {/* Control buttons - visible when menu open */}
                 {mobileMenuOpen && (
                     <div style={{
                         paddingTop: '12px',
-                        borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
+                        borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                        marginTop: '12px'
                     }}>
-                        <h3 style={{
-                            fontSize: '0.7rem',
-                            color: 'var(--grey)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.1em',
-                            marginBottom: '12px'
-                        }}>
-                            Options
-                        </h3>
-                        <div style={{
-                            display: 'flex',
-                            gap: '15px',
-                            alignItems: 'center'
-                        }}>
+                        <div style={{ marginBottom: '16px' }}>
+                            <h3 style={{
+                                fontSize: '0.7rem',
+                                color: 'var(--grey)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                marginBottom: '8px'
+                            }}>Writer</h3>
+                            <SearchableSelect
+                                options={writers}
+                                value={activeWriter}
+                                onChange={onWriterChange}
+                                placeholder="Search writers..."
+                                darkMode={darkMode}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
+                            <Link to="/about" style={{
+                                fontSize: '0.9rem',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                textDecoration: 'none'
+                            }}>About</Link>
+                            <span style={{ color: 'var(--grey)' }}>/</span>
+                            <Link to="/contact" style={{
+                                fontSize: '0.9rem',
+                                color: darkMode ? 'var(--text-color)' : '#000',
+                                textDecoration: 'none'
+                            }}>Contact</Link>
+                        </div>
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                             <button onClick={onThemeToggle} style={{
                                 background: 'none',
                                 border: 'none',
@@ -564,7 +381,6 @@ const Sidebar = ({ filters, activeFilters, onFilterChange, darkMode, onThemeTogg
                 )}
             </header>
 
-            {/* Add responsive styles */}
             <style>{`
                 @media (max-width: 768px) {
                     .desktop-sidebar {

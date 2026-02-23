@@ -45,26 +45,19 @@ function App() {
   };
   const [shuffledPhotos] = useState(() => shuffleArray(photos));
   const [activeFilters, setActiveFilters] = useState({
-    location: null,
-    style: null,
-    author: null
+    writer: null,
   });
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   // Extract unique filter options
-  const filters = useMemo(() => {
-    const locations = [...new Set(shuffledPhotos.map(p => p.location))].sort();
-    const styles = [...new Set(shuffledPhotos.map(p => p.style))].sort();
-    const authors = [...new Set(shuffledPhotos.map(p => p.author))].sort();
-    return { locations, styles, authors };
+  const writers = useMemo(() => {
+    return [...new Set(shuffledPhotos.map(p => p.writer))].sort();
   }, [shuffledPhotos]);
 
   // Filter photos
   const filteredPhotos = useMemo(() => {
     return shuffledPhotos.filter(photo => {
-      if (activeFilters.location && photo.location !== activeFilters.location) return false;
-      if (activeFilters.style && photo.style !== activeFilters.style) return false;
-      if (activeFilters.author && photo.author !== activeFilters.author) return false;
+      if (activeFilters.writer && photo.writer !== activeFilters.writer) return false;
       return true;
     });
   }, [shuffledPhotos, activeFilters]);
@@ -85,13 +78,13 @@ function App() {
         transition: 'background-color 0.3s, color 0.3s'
       }}>
         <Sidebar
-          filters={filters}
-          activeFilters={activeFilters}
-          onFilterChange={handleFilterChange}
           darkMode={darkMode}
           onThemeToggle={() => setDarkMode(!darkMode)}
           layoutMode={layoutMode}
           onLayoutToggle={handleLayoutToggle}
+          writers={writers}
+          activeWriter={activeFilters.writer}
+          onWriterChange={(val) => handleFilterChange('writer', val)}
         />
 
         <main className="main-content" style={{
