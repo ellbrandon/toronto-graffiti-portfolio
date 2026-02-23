@@ -153,7 +153,7 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate }) => {
             >
                 <img
                     src={photo.url}
-                    alt={`${photo.style} at ${photo.location}`}
+                    alt={`${photo.what} at ${photo.where}`}
                     style={{
                         maxWidth: '100%',
                         maxHeight: 'calc(90vh - 120px)',
@@ -162,9 +162,9 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate }) => {
                     }}
                 />
                 <div style={{ textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '5px' }}>{photo.location}</h2>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '5px' }}>{photo.where}</h2>
                     <p style={{ color: '#888' }}>
-                        <span style={{ color: '#fff' }}>{photo.author}</span> • {photo.style}
+                        <span style={{ color: '#fff' }}>{photo.writer}</span> • {photo.what}
                     </p>
                 </div>
             </div>

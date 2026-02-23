@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
-import WritersGallery from './components/WritersGallery';
+import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -30,7 +30,6 @@ function App() {
   const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
   const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
 
-  // Persist settings
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
@@ -44,22 +43,30 @@ function App() {
     const nextIndex = (modes.indexOf(layoutMode) + 1) % modes.length;
     setLayoutMode(modes[nextIndex]);
   };
+
   const [shuffledPhotos] = useState(() => shuffleArray(photos));
+
   const [activeFilters, setActiveFilters] = useState({
     writer: null,
+    what: null,
+    where: null,
   });
+
+  // null = photo grid, 'writer' | 'what' | 'where' = that all-gallery is shown
+  const [activeGallery, setActiveGallery] = useState(null);
+
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [showWritersGallery, setShowWritersGallery] = useState(false);
 
-  // Extract unique filter options
-  const writers = useMemo(() => {
-    return [...new Set(shuffledPhotos.map(p => p.writer))].sort();
-  }, [shuffledPhotos]);
+  // Unique sorted values for each field
+  const writers = useMemo(() => [...new Set(shuffledPhotos.map(p => p.writer))].sort(), [shuffledPhotos]);
+  const whats   = useMemo(() => [...new Set(shuffledPhotos.map(p => p.what))].sort(),   [shuffledPhotos]);
+  const wheres  = useMemo(() => [...new Set(shuffledPhotos.map(p => p.where))].sort(),  [shuffledPhotos]);
 
-  // Filter photos
   const filteredPhotos = useMemo(() => {
     return shuffledPhotos.filter(photo => {
       if (activeFilters.writer && photo.writer !== activeFilters.writer) return false;
+      if (activeFilters.what   && photo.what   !== activeFilters.what)   return false;
+      if (activeFilters.where  && photo.where  !== activeFilters.where)  return false;
       return true;
     });
   }, [shuffledPhotos, activeFilters]);
@@ -69,6 +76,23 @@ function App() {
       ...prev,
       [type]: value === prev[type] ? null : value
     }));
+  };
+
+  // Clicking a card in AllGallery applies that filter and returns to photo grid
+  const handleGallerySelect = (field, value) => {
+    handleFilterChange(field, value);
+    setActiveGallery(null);
+  };
+
+  // Toggle a gallery panel; clicking the same one again closes it
+  const handleShowGallery = (field) => {
+    setActiveGallery(prev => prev === field ? null : field);
+  };
+
+  const galleryConfig = {
+    writer: { field: 'writer', values: writers },
+    what:   { field: 'what',   values: whats },
+    where:  { field: 'where',  values: wheres },
   };
 
   return (
@@ -86,11 +110,15 @@ function App() {
           onLayoutToggle={handleLayoutToggle}
           writers={writers}
           activeWriter={activeFilters.writer}
-          onWriterChange={(val) => { handleFilterChange('writer', val); setShowWritersGallery(false); }}
-          allPhotos={shuffledPhotos}
-          showWritersGallery={showWritersGallery}
-          onShowWritersGallery={() => setShowWritersGallery(true)}
-          onHideWritersGallery={() => setShowWritersGallery(false)}
+          onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); }}
+          whats={whats}
+          activeWhat={activeFilters.what}
+          onWhatChange={(val) => { handleFilterChange('what', val); setActiveGallery(null); }}
+          wheres={wheres}
+          activeWhere={activeFilters.where}
+          onWhereChange={(val) => { handleFilterChange('where', val); setActiveGallery(null); }}
+          activeGallery={activeGallery}
+          onShowGallery={handleShowGallery}
         />
 
         <main className="main-content" style={{
@@ -98,20 +126,64 @@ function App() {
           width: 'calc(100% - 250px)',
           height: '100vh',
           overflowY: 'auto',
-          // paddingTop: '40px', // Removed padding here, manage in components or routes if needed, specifically About needs full height
           paddingTop: '0',
           backgroundColor: darkMode ? '#000000' : '#ffffff',
           transition: 'background-color 0.3s'
         }}>
-          <div style={{ paddingTop: '40px' }}> {/* Wrap potentially scrolling content like PhotoGrid if needed, or just apply padding to PhotoGrid container */}
-            <Routes>
-              <Route path="/" element={
+          <Routes>
+            <Route path="/" element={
                 <div style={{ paddingTop: '40px' }}>
-                  {showWritersGallery ? (
-                    <WritersGallery
+                  {/* Breadcrumbs */}
+                  {(() => {
+                    const crumbs = [];
+                    const crumbStyle = { fontSize: '0.7rem', color: 'var(--hover-color)', letterSpacing: '0.05em' };
+                    const sepStyle = { ...crumbStyle, margin: '0 6px' };
+                    const linkStyle = { ...crumbStyle, cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '2px', background: 'none', border: 'none', padding: 0, color: 'var(--hover-color)' };
+
+                    // Root crumb — always present
+                    const hasAnything = activeGallery || activeFilters.writer || activeFilters.what || activeFilters.where;
+                    crumbs.push(
+                      hasAnything
+                        ? <button key="root" style={linkStyle} onClick={() => { setActiveFilters({ writer: null, what: null, where: null }); setActiveGallery(null); }}>All Photos</button>
+                        : <span key="root" style={crumbStyle}>All Photos</span>
+                    );
+
+                    if (activeGallery) {
+                      // e.g. All Photos > Writers
+                      const label = activeGallery === 'writer' ? 'Writers' : activeGallery === 'what' ? 'What' : 'Where';
+                      crumbs.push(<span key="sep1" style={sepStyle}>/</span>);
+                      crumbs.push(<span key="gallery" style={crumbStyle}>{label}</span>);
+                    } else {
+                      // Active filter crumbs
+                      const filterEntries = [
+                        { key: 'writer', value: activeFilters.writer },
+                        { key: 'what',   value: activeFilters.what },
+                        { key: 'where',  value: activeFilters.where },
+                      ].filter(f => f.value);
+
+                      filterEntries.forEach((f, i) => {
+                        crumbs.push(<span key={`sep${i}`} style={sepStyle}>/</span>);
+                        crumbs.push(
+                          <button key={f.key} style={linkStyle} onClick={() => handleFilterChange(f.key, f.value)}>
+                            {f.value}
+                          </button>
+                        );
+                      });
+                    }
+
+                    return (
+                      <div style={{ padding: '0 40px 16px', display: 'flex', alignItems: 'center' }}>
+                        {crumbs}
+                      </div>
+                    );
+                  })()}
+
+                  {activeGallery ? (
+                    <AllGallery
                       allPhotos={shuffledPhotos}
-                      writers={writers}
-                      onSelectWriter={(writer) => { handleFilterChange('writer', writer); setShowWritersGallery(false); }}
+                      field={galleryConfig[activeGallery].field}
+                      values={galleryConfig[activeGallery].values}
+                      onSelect={(value) => handleGallerySelect(activeGallery, value)}
                       layoutMode={layoutMode}
                     />
                   ) : (
@@ -126,8 +198,7 @@ function App() {
               } />
               <Route path="/about" element={<About darkMode={darkMode} colorMode={true} />} />
               <Route path="/contact" element={<Contact darkMode={darkMode} colorMode={true} />} />
-            </Routes>
-          </div>
+          </Routes>
         </main>
 
         <PhotoModal
@@ -142,7 +213,7 @@ function App() {
             .main-content {
               margin-left: 0 !important;
               width: 100% !important;
-              padding-top: 50px !important; /* Adjusted for mobile header */
+              padding-top: 50px !important;
             }
           }
         `}</style>

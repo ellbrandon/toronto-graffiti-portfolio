@@ -144,7 +144,7 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
     };
 
     return (
-        <div className="container" style={{ paddingBottom: '100px' }}>
+        <div style={{ padding: '0 40px 100px' }}>
             <div
                 ref={gridRef}
                 className={layoutMode === 'grid' ? 'layout-grid-active' : ''}
@@ -163,7 +163,7 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
                         <div className="img-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
                             <img
                                 src={photo.url}
-                                alt={`${photo.style} at ${photo.location}`}
+                                alt={`${photo.what} at ${photo.where}`}
                                 className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
                                 style={{
                                     width: '100%',
@@ -184,8 +184,8 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode }) => {
                                 transition: 'opacity 0.3s ease',
                                 pointerEvents: 'none'
                             }}>
-                                <p style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{photo.location}</p>
-                                <p style={{ fontSize: '0.8rem', color: '#ccc' }}>{photo.author}</p>
+                                <p style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{photo.where}</p>
+                                <p style={{ fontSize: '0.8rem', color: '#ccc' }}>{photo.writer}</p>
                             </div>
                         </div>
                     </div>

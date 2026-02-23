@@ -3,9 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Sun, Moon, Menu, X, LayoutDashboard, LayoutGrid, RectangleVertical, Maximize, Search, XCircle } from 'lucide-react';
 
 // Reusable input with optional left/right icon slots
-const IconInput = ({ iconLeft, iconRight, darkMode, active, onClick, children, ...props }) => {
+const IconInput = ({ iconLeft, iconRight, darkMode, onClick, children }) => {
     const borderColor = darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
-    const textColor = darkMode ? 'var(--text-color)' : '#000';
     return (
         <div
             onClick={onClick}
@@ -80,7 +79,6 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
         <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
             <IconInput
                 darkMode={darkMode}
-                active={!!value}
                 onClick={() => setOpen(true)}
                 iconLeft={<Search size={14} />}
                 iconRight={clearButton}
@@ -146,8 +144,69 @@ const SearchableSelect = ({ options, value, onChange, placeholder, darkMode }) =
     );
 };
 
-const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers, activeWriter, onWriterChange, showWritersGallery, onShowWritersGallery, onHideWritersGallery }) => {
+// Reusable filter section: title + search + "All X" button
+const FilterSection = ({ title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, darkMode }) => {
+    const isGalleryOpen = activeGallery === galleryKey;
+    return (
+        <div style={{ marginBottom: '30px' }}>
+            <h3 style={{
+                fontSize: '0.7rem',
+                color: 'var(--grey)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '10px'
+            }}>{title}</h3>
+            <SearchableSelect
+                options={options}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                darkMode={darkMode}
+            />
+            <button
+                onClick={() => onShowGallery(galleryKey)}
+                style={{
+                    marginTop: '8px',
+                    width: '100%',
+                    padding: '6px 8px',
+                    background: '#000',
+                    border: '1px solid #000',
+                    borderRadius: '3px',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    color: '#fff',
+                    textAlign: 'left',
+                    transition: 'opacity 0.2s',
+                    opacity: isGalleryOpen ? 0.6 : 1,
+                }}
+            >
+                All {title}
+            </button>
+        </div>
+    );
+};
+
+const Sidebar = ({
+    darkMode, onThemeToggle, layoutMode, onLayoutToggle,
+    writers, activeWriter, onWriterChange,
+    whats, activeWhat, onWhatChange,
+    wheres, activeWhere, onWhereChange,
+    activeGallery, onShowGallery,
+}) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const filterSections = [
+        { title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
+        { title: 'What',    options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
+        { title: 'Where',   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
+    ];
+
+    const layoutIcons = {
+        masonry: <LayoutDashboard size={20} />,
+        grid:    <LayoutGrid size={20} />,
+        single:  <RectangleVertical size={20} />,
+        full:    <Maximize size={20} />,
+    };
 
     return (
         <>
@@ -195,40 +254,20 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                     </Link>
 
                     <nav>
-                        <div style={{ marginBottom: '30px' }}>
-                            <h3 style={{
-                                fontSize: '0.7rem',
-                                color: 'var(--grey)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.1em',
-                                marginBottom: '10px'
-                            }}>Writers</h3>
-                            <SearchableSelect
-                                options={writers}
-                                value={activeWriter}
-                                onChange={onWriterChange}
-                                placeholder="Search writers..."
+                        {filterSections.map(s => (
+                            <FilterSection
+                                key={s.galleryKey}
+                                title={s.title}
+                                options={s.options}
+                                value={s.value}
+                                onChange={s.onChange}
+                                placeholder={s.placeholder}
+                                galleryKey={s.galleryKey}
+                                activeGallery={activeGallery}
+                                onShowGallery={onShowGallery}
                                 darkMode={darkMode}
                             />
-                            <button
-                                onClick={showWritersGallery ? onHideWritersGallery : onShowWritersGallery}
-                                style={{
-                                    marginTop: '8px',
-                                    width: '100%',
-                                    padding: '6px 8px',
-                                    background: '#000',
-                                    border: '1px solid #000',
-                                    borderRadius: '3px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    color: '#fff',
-                                    textAlign: 'left',
-                                    transition: 'opacity 0.2s',
-                                }}
-                            >
-                                All Writers
-                            </button>
-                        </div>
+                        ))}
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <Link to="/about" style={{
@@ -269,14 +308,9 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                         <button
                             onClick={onThemeToggle}
                             style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
+                                background: 'none', border: 'none', cursor: 'pointer',
                                 color: darkMode ? 'var(--text-color)' : '#000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s'
+                                display: 'flex', alignItems: 'center', padding: 0, transition: 'transform 0.2s'
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -288,23 +322,15 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                         <button
                             onClick={onLayoutToggle}
                             style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
+                                background: 'none', border: 'none', cursor: 'pointer',
                                 color: darkMode ? 'var(--text-color)' : '#000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0,
-                                transition: 'transform 0.2s'
+                                display: 'flex', alignItems: 'center', padding: 0, transition: 'transform 0.2s'
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             title={`Current Layout: ${layoutMode}`}
                         >
-                            {layoutMode === 'masonry' && <LayoutDashboard size={20} />}
-                            {layoutMode === 'grid' && <LayoutGrid size={20} />}
-                            {layoutMode === 'single' && <RectangleVertical size={20} />}
-                            {layoutMode === 'full' && <Maximize size={20} />}
+                            {layoutIcons[layoutMode]}
                         </button>
                     </div>
 
@@ -323,9 +349,7 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
             <header className="mobile-header" style={{
                 display: 'none',
                 position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
+                top: 0, left: 0, right: 0,
                 backgroundColor: darkMode ? 'var(--bg-color)' : '#ffffff',
                 borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                 padding: '12px 16px',
@@ -333,33 +357,17 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                 transition: 'background-color 0.3s'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Link
-                        to="/"
-                        style={{
-                            textDecoration: 'none',
-                            color: darkMode ? 'var(--text-color)' : '#000'
-                        }}
-                    >
-                        <h1 style={{
-                            fontSize: '1.2rem',
-                            fontWeight: 'bold',
-                            letterSpacing: '0.05em',
-                            margin: 0
-                        }}>
+                    <Link to="/" style={{ textDecoration: 'none', color: darkMode ? 'var(--text-color)' : '#000' }}>
+                        <h1 style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '0.05em', margin: 0 }}>
                             TORONTO GRAFFITI
                         </h1>
                     </Link>
-
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
+                            background: 'none', border: 'none', cursor: 'pointer',
                             color: darkMode ? 'var(--text-color)' : '#000',
-                            padding: 0,
-                            display: 'flex',
-                            alignItems: 'center'
+                            padding: 0, display: 'flex', alignItems: 'center'
                         }}
                     >
                         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -372,79 +380,32 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
                         borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                         marginTop: '12px'
                     }}>
-                        <div style={{ marginBottom: '16px' }}>
-                            <h3 style={{
-                                fontSize: '0.7rem',
-                                color: 'var(--grey)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.1em',
-                                marginBottom: '8px'
-                            }}>Writer</h3>
-                            <SearchableSelect
-                                options={writers}
-                                value={activeWriter}
-                                onChange={onWriterChange}
-                                placeholder="Search writers..."
+                        {filterSections.map(s => (
+                            <FilterSection
+                                key={s.galleryKey}
+                                title={s.title}
+                                options={s.options}
+                                value={s.value}
+                                onChange={s.onChange}
+                                placeholder={s.placeholder}
+                                galleryKey={s.galleryKey}
+                                activeGallery={activeGallery}
+                                onShowGallery={onShowGallery}
                                 darkMode={darkMode}
                             />
-                            <button
-                                onClick={showWritersGallery ? onHideWritersGallery : onShowWritersGallery}
-                                style={{
-                                    marginTop: '8px',
-                                    width: '100%',
-                                    padding: '6px 8px',
-                                    background: '#000',
-                                    border: '1px solid #000',
-                                    borderRadius: '3px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    color: '#fff',
-                                    textAlign: 'left',
-                                    transition: 'opacity 0.2s',
-                                }}
-                            >
-                                All Writers
-                            </button>
-                        </div>
+                        ))}
 
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
-                            <Link to="/about" style={{
-                                fontSize: '0.9rem',
-                                color: darkMode ? 'var(--text-color)' : '#000',
-                                textDecoration: 'none'
-                            }}>About</Link>
+                            <Link to="/about" style={{ fontSize: '0.9rem', color: darkMode ? 'var(--text-color)' : '#000', textDecoration: 'none' }}>About</Link>
                             <span style={{ color: 'var(--grey)' }}>/</span>
-                            <Link to="/contact" style={{
-                                fontSize: '0.9rem',
-                                color: darkMode ? 'var(--text-color)' : '#000',
-                                textDecoration: 'none'
-                            }}>Contact</Link>
+                            <Link to="/contact" style={{ fontSize: '0.9rem', color: darkMode ? 'var(--text-color)' : '#000', textDecoration: 'none' }}>Contact</Link>
                         </div>
                         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                            <button onClick={onThemeToggle} style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: darkMode ? 'var(--text-color)' : '#000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0
-                            }}>
+                            <button onClick={onThemeToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: darkMode ? 'var(--text-color)' : '#000', display: 'flex', alignItems: 'center', padding: 0 }}>
                                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                             </button>
-                            <button onClick={onLayoutToggle} style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                color: darkMode ? 'var(--text-color)' : '#000',
-                                display: 'flex',
-                                alignItems: 'center',
-                                padding: 0
-                            }}>
-                                {layoutMode === 'masonry' && <LayoutDashboard size={20} />}
-                                {layoutMode === 'grid' && <LayoutGrid size={20} />}
-                                {layoutMode === 'single' && <RectangleVertical size={20} />}
-                                {layoutMode === 'full' && <Maximize size={20} />}
+                            <button onClick={onLayoutToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: darkMode ? 'var(--text-color)' : '#000', display: 'flex', alignItems: 'center', padding: 0 }}>
+                                {layoutIcons[layoutMode]}
                             </button>
                         </div>
                     </div>
@@ -453,17 +414,11 @@ const Sidebar = ({ darkMode, onThemeToggle, layoutMode, onLayoutToggle, writers,
 
             <style>{`
                 @media (max-width: 768px) {
-                    .desktop-sidebar {
-                        display: none !important;
-                    }
-                    .mobile-header {
-                        display: block !important;
-                    }
+                    .desktop-sidebar { display: none !important; }
+                    .mobile-header { display: block !important; }
                 }
                 @media (min-width: 769px) {
-                    .mobile-header {
-                        display: none !important;
-                    }
+                    .mobile-header { display: none !important; }
                 }
             `}</style>
         </>
