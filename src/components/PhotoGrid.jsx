@@ -1,6 +1,42 @@
 import React from 'react';
 import { Frown } from 'lucide-react';
 import { useLayout } from '../hooks/useLayout';
+import ImageCursor, { useCursor } from './ImageCursor';
+
+const PhotoCard = ({ photo, onPhotoClick, colorMode, layoutMode }) => {
+    const { cursorState, onMouseMove, onMouseEnter, onMouseLeave } = useCursor();
+    return (
+        <div
+            className="grid-item"
+            onClick={() => onPhotoClick(photo)}
+            onMouseMove={onMouseMove}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+        >
+            <div className="img-wrapper">
+                <img
+                    src={photo.url}
+                    alt={`${photo.what} at ${photo.where}`}
+                    className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
+                    style={{ objectFit: layoutMode === 'grid' ? 'cover' : 'initial' }}
+                    loading="lazy"
+                    decoding="async"
+                />
+                <div className="overlay">
+                    {photo.where || photo.writer ? (
+                        <>
+                            <p className="overlay-title">{photo.where}</p>
+                            <p className="overlay-subtitle">{photo.writer}</p>
+                        </>
+                    ) : photo.description ? (
+                        <p className="overlay-title">{photo.description}</p>
+                    ) : null}
+                </div>
+                <ImageCursor x={cursorState.x} y={cursorState.y} visible={cursorState.visible} />
+            </div>
+        </div>
+    );
+};
 
 const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters }) => {
     const gridRef = useLayout('.grid-item', '.grid-sizer', [photos, layoutMode]);
@@ -30,32 +66,13 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
                 {layoutMode === 'masonry' && <div className="grid-sizer" />}
 
                 {photos.map((photo) => (
-                    <div
+                    <PhotoCard
                         key={photo.id}
-                        className="grid-item"
-                        onClick={() => onPhotoClick(photo)}
-                    >
-                        <div className="img-wrapper">
-                            <img
-                                src={photo.url}
-                                alt={`${photo.what} at ${photo.where}`}
-                                className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
-                                style={{ objectFit: layoutMode === 'grid' ? 'cover' : 'initial' }}
-                                loading="lazy"
-                                decoding="async"
-                            />
-                            <div className="overlay">
-                                {photo.where || photo.writer ? (
-                                    <>
-                                        <p className="overlay-title">{photo.where}</p>
-                                        <p className="overlay-subtitle">{photo.writer}</p>
-                                    </>
-                                ) : photo.description ? (
-                                    <p className="overlay-title">{photo.description}</p>
-                                ) : null}
-                            </div>
-                        </div>
-                    </div>
+                        photo={photo}
+                        onPhotoClick={onPhotoClick}
+                        colorMode={colorMode}
+                        layoutMode={layoutMode}
+                    />
                 ))}
             </div>
         </div>

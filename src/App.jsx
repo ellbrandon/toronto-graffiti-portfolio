@@ -36,7 +36,7 @@ const applySortValues = (values, sortMode) => {
 
 function AppContent() {
   const navigate = useNavigate();
-  const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', true));
+  const [darkMode, setDarkMode] = useState(() => getInitialState('darkMode', false));
   const [layoutMode, setLayoutMode] = useState(() => getInitialState('layoutMode', 'masonry'));
   const [sortMode, setSortMode] = useState(() => getInitialState('sortMode', 'date-desc'));
 

@@ -1,4 +1,5 @@
 import { useLayout } from '../hooks/useLayout';
+import ImageCursor, { useCursor } from './ImageCursor';
 
 // Generic gallery showing one representative image per unique value of `field`.
 // Props:
@@ -7,6 +8,28 @@ import { useLayout } from '../hooks/useLayout';
 //   values     - sorted array of unique values for that field
 //   onSelect   - called with the chosen value when a card is clicked
 //   layoutMode - 'masonry' | 'grid' | 'single' | 'full'
+
+const GalleryCard = ({ value, photo, onSelect }) => {
+    const { cursorState, onMouseMove, onMouseEnter, onMouseLeave } = useCursor();
+    return (
+        <div
+            className="gallery-item"
+            onClick={() => onSelect(value)}
+            onMouseMove={onMouseMove}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+        >
+            <div className="gallery-item-inner">
+                <img src={photo.url} alt={value} loading="lazy" decoding="async" />
+                <div className="gallery-item-overlay">
+                    <p className="gallery-item-label">{value}</p>
+                </div>
+                <ImageCursor x={cursorState.x} y={cursorState.y} visible={cursorState.visible} />
+            </div>
+        </div>
+    );
+};
+
 const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
     const cards = values.map(value => ({
         value,
@@ -25,18 +48,12 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
                 {layoutMode === 'masonry' && <div className="gallery-sizer" />}
 
                 {cards.map(({ value, photo }) => (
-                    <div
+                    <GalleryCard
                         key={value}
-                        className="gallery-item"
-                        onClick={() => onSelect(value)}
-                    >
-                        <div className="gallery-item-inner">
-                            <img src={photo.url} alt={value} loading="lazy" decoding="async" />
-                            <div className="gallery-item-overlay">
-                                <p className="gallery-item-label">{value}</p>
-                            </div>
-                        </div>
-                    </div>
+                        value={value}
+                        photo={photo}
+                        onSelect={onSelect}
+                    />
                 ))}
             </div>
         </div>

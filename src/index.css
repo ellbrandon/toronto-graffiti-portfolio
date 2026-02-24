@@ -804,14 +804,63 @@ h1 {
 }
 
 /* ============================================================
-   MAGIC CURSOR
+   IMAGE CURSOR
    ============================================================ */
-.grid-item { cursor: zoom-in; }
+.grid-item,
+.gallery-item { cursor: none; }
 
-body.magic-cursor-enabled a,
-body.magic-cursor-enabled button,
-body.magic-cursor-enabled .grid-item {
-  cursor: none;
+.img-cursor {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.6s, transform 0.6s;
+  z-index: 10;
+}
+
+.img-cursor svg {
+  fill: transparent;
+  stroke: white;
+  stroke-width: 2.5;
+  stroke-dasharray: 160;
+  stroke-dashoffset: 160;
+  overflow: visible;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+/* crosshair arms */
+.img-cursor::before,
+.img-cursor::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 2px;
+  background-color: white;
+  transition: width 0.8s ease, height 0.8s ease;
+  transform: translate(-50%, -50%);
+}
+
+.img-cursor::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* visible state */
+.img-cursor--visible {
+  opacity: 1;
+}
+
+.img-cursor--visible svg {
+  stroke-dashoffset: 0;
+}
+
+.img-cursor--visible::before,
+.img-cursor--visible::after {
+  width: 18px;
+  height: 2px;
 }
 
 /* ============================================================

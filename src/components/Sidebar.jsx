@@ -227,8 +227,7 @@ const Sidebar = ({
                         {sortBtn}
                     </div>
                     <p className="sidebar-copyright">
-                        &copy; {new Date().getFullYear()}<br />
-                        ALL RIGHTS RESERVED
+                        &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
                     </p>
                 </div>
             </aside>
