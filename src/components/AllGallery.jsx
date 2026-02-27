@@ -33,7 +33,10 @@ const GalleryCard = ({ value, photo, onSelect }) => {
 const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
     const cards = values.map(value => ({
         value,
-        photo: allPhotos.find(p => p[field] === value),
+        // writers is an array; other fields are plain strings
+        photo: field === 'writer'
+            ? allPhotos.find(p => p.writers.includes(value))
+            : allPhotos.find(p => p[field] === value),
     })).filter(c => c.photo);
 
     // Include the first value in deps so reordering (alpha/random) triggers a re-layout

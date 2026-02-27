@@ -23,10 +23,10 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode, layoutMode }) => {
                     decoding="async"
                 />
                 <div className="overlay">
-                    {photo.where || photo.writer ? (
+                    {(photo.where || photo.writers?.length > 0) ? (
                         <>
                             <p className="overlay-title">{photo.where}</p>
-                            <p className="overlay-subtitle">{photo.writer}</p>
+                            <p className="overlay-subtitle">{photo.writers?.join(' · ')}</p>
                         </>
                     ) : photo.description ? (
                         <p className="overlay-title">{photo.description}</p>

@@ -5,7 +5,7 @@ import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
 import PlacesPage from './components/PlacesPage';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { photos } from './data/photos';
+import { fetchPhotos } from './data/photos';
 
 const getInitialState = (key, defaultValue) => {
   const saved = localStorage.getItem(key);
@@ -19,8 +19,8 @@ const SORT_MODES = ['date-desc', 'date-asc', 'alpha-asc', 'alpha-desc', 'random'
 const applySort = (array, sortMode) => {
   switch (sortMode) {
     case 'date-asc':   return [...array].sort((a, b) => new Date(a.uploaded) - new Date(b.uploaded));
-    case 'alpha-asc':  return [...array].sort((a, b) => a.writer.localeCompare(b.writer));
-    case 'alpha-desc': return [...array].sort((a, b) => b.writer.localeCompare(a.writer));
+    case 'alpha-asc':  return [...array].sort((a, b) => (a.writers[0] ?? '').localeCompare(b.writers[0] ?? ''));
+    case 'alpha-desc': return [...array].sort((a, b) => (b.writers[0] ?? '').localeCompare(a.writers[0] ?? ''));
     case 'random':     return [...array].sort(() => Math.random() - 0.5);
     default:           return [...array].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
   }
@@ -53,29 +53,39 @@ function AppContent() {
     setSortMode(SORT_MODES[(SORT_MODES.indexOf(sortMode) + 1) % SORT_MODES.length]);
   };
 
-  const basePhotos = useMemo(() => [...photos], []);
+  // --- Async photo loading ---
+  const [basePhotos, setBasePhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+
+  useEffect(() => {
+    fetchPhotos()
+      .then(data => { setBasePhotos(data); setLoading(false); })
+      .catch(err => { setLoadError(err.message); setLoading(false); });
+  }, []);
 
   const [activeFilters, setActiveFilters] = useState({ writer: null, what: null, where: null });
   const [activeGallery, setActiveGallery] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  // All unique filter values — always alpha sorted for the sidebar dropdowns
-  const writers = useMemo(() => [...new Set(basePhotos.map(p => p.writer))].sort(), [basePhotos]);
-  const whats   = useMemo(() => [...new Set(basePhotos.map(p => p.what))].sort(),   [basePhotos]);
-  const wheres  = useMemo(() => [...new Set(basePhotos.map(p => p.where))].sort(),  [basePhotos]);
+  // Unique filter values — writers are flattened from arrays
+  const writers = useMemo(() => [...new Set(basePhotos.flatMap(p => p.writers))].sort(), [basePhotos]);
+  const whats   = useMemo(() => [...new Set(basePhotos.map(p => p.what).filter(Boolean))].sort(),   [basePhotos]);
+  const wheres  = useMemo(() => [...new Set(basePhotos.map(p => p.where).filter(Boolean))].sort(),  [basePhotos]);
 
   // Filtered then sorted photo list for PhotoGrid
+  // writer filter: photo matches if ANY of its writers match the active filter
   const displayPhotos = useMemo(() => {
     const filtered = basePhotos.filter(photo => {
-      if (activeFilters.writer && photo.writer !== activeFilters.writer) return false;
-      if (activeFilters.what   && photo.what   !== activeFilters.what)   return false;
-      if (activeFilters.where  && photo.where  !== activeFilters.where)  return false;
+      if (activeFilters.writer && !photo.writers.includes(activeFilters.writer)) return false;
+      if (activeFilters.what   && photo.what  !== activeFilters.what)            return false;
+      if (activeFilters.where  && photo.where !== activeFilters.where)           return false;
       return true;
     });
     return applySort(filtered, sortMode);
   }, [basePhotos, activeFilters, sortMode]);
 
-  // Sorted values for AllGallery cards — memoised so random only shuffles on sortMode change
+  // Sorted values for AllGallery cards
   const gallerySortedValues = useMemo(() => ({
     writer: applySortValues(writers, sortMode),
     what:   applySortValues(whats,   sortMode),
@@ -159,22 +169,37 @@ function AppContent() {
               <div className="route-wrapper">
                 <div className="breadcrumb-bar">{buildBreadcrumbs()}</div>
 
-                {activeGallery ? (
-                  <AllGallery
-                    allPhotos={basePhotos}
-                    field={galleryConfig[activeGallery].field}
-                    values={galleryConfig[activeGallery].values}
-                    onSelect={(value) => handleGallerySelect(activeGallery, value)}
-                    layoutMode={layoutMode}
-                  />
-                ) : (
-                  <PhotoGrid
-                    photos={displayPhotos}
-                    onPhotoClick={setSelectedPhoto}
-                    colorMode={true}
-                    layoutMode={layoutMode}
-                    onClearFilters={clearAllFilters}
-                  />
+                {loading && (
+                  <div className="photo-grid-empty">
+                    <p className="photo-grid-empty-title">Loading photos…</p>
+                  </div>
+                )}
+
+                {loadError && (
+                  <div className="photo-grid-empty">
+                    <p className="photo-grid-empty-title">Could not load photos</p>
+                    <p className="photo-grid-empty-subtitle">{loadError}</p>
+                  </div>
+                )}
+
+                {!loading && !loadError && (
+                  activeGallery ? (
+                    <AllGallery
+                      allPhotos={basePhotos}
+                      field={galleryConfig[activeGallery].field}
+                      values={galleryConfig[activeGallery].values}
+                      onSelect={(value) => handleGallerySelect(activeGallery, value)}
+                      layoutMode={layoutMode}
+                    />
+                  ) : (
+                    <PhotoGrid
+                      photos={displayPhotos}
+                      onPhotoClick={setSelectedPhoto}
+                      colorMode={true}
+                      layoutMode={layoutMode}
+                      onClearFilters={clearAllFilters}
+                    />
+                  )
                 )}
               </div>
             } />

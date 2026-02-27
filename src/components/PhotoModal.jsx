@@ -63,11 +63,19 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
                     className="modal-photo"
                 />
                 <div className="modal-tags">
+                    {photo.writers.map(writer => (
+                        <button
+                            key={writer}
+                            className="btn-ghost"
+                            onClick={() => { onSelectFilter('writer', writer); onClose(); }}
+                        >
+                            {writer}
+                        </button>
+                    ))}
                     {[
-                        { field: 'writer', value: photo.writer },
-                        { field: 'what',   value: photo.what },
-                        { field: 'where',  value: photo.where },
-                    ].map(({ field, value }) => (
+                        { field: 'what',  value: photo.what },
+                        { field: 'where', value: photo.where },
+                    ].filter(({ value }) => value).map(({ field, value }) => (
                         <button
                             key={field}
                             className="btn-ghost"
