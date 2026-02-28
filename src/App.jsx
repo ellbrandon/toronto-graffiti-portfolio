@@ -1,11 +1,20 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
 import PlacesPage from './components/PlacesPage';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { fetchPhotos } from './data/photos';
+
+const SiteHeader = ({ onHomeClick }) => (
+  <header className="site-header">
+    <Link to="/" className="site-title-link" onClick={onHomeClick}>
+      <h1 className="site-title">TORONTO GRAFFITI</h1>
+      <p className="site-subtitle">ARCHIVE 2010-2025</p>
+    </Link>
+  </header>
+);
 
 const applySort = (array) =>
   [...array].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
@@ -73,6 +82,8 @@ function AppContent() {
   return (
     <>
       <div className="app" data-theme={lightMode ? 'light' : 'dark'}>
+        <SiteHeader onHomeClick={() => { clearAllFilters(); setActiveGallery(null); navigate('/'); }} />
+        <div className="app-body">
         <Sidebar
           writers={writers}
           activeWriter={activeFilters.writer}
@@ -134,6 +145,7 @@ function AppContent() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        </div>
 
         <PhotoModal
           photo={selectedPhoto}

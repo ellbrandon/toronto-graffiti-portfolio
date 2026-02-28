@@ -94,22 +94,55 @@ h1 {
    ============================================================ */
 .app {
   display: flex;
+  flex-direction: column;
+  height: 100vh;
   background-color: var(--theme-bg);
   color: var(--theme-text);
   transition: background-color 0.3s, color 0.3s;
 }
 
+.site-header {
+  flex-shrink: 0;
+  width: 100%;
+  padding: 15px 20px;
+  background-color: var(--theme-bg);
+  border-bottom: 1px solid var(--theme-border-faint);
+  transition: background-color 0.3s;
+  z-index: 110;
+}
+
+.site-header .site-title-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  text-decoration: none;
+  color: var(--theme-text);
+}
+
+.site-header .site-title {
+  margin-bottom: 0;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.desktop-sidebar {
+  flex-shrink: 0;
+}
+
 .main-content {
-  margin-left: 290px;
-  width: calc(100% - 290px);
-  height: 100vh;
+  flex: 1;
+  min-width: 0;
   overflow-y: auto;
   background-color: var(--theme-bg);
   transition: background-color 0.3s;
 }
 
 .route-wrapper {
-  padding-top: 40px;
+  padding: 20px;
 }
 
 
@@ -189,32 +222,30 @@ h1 {
    ============================================================ */
 .desktop-sidebar {
   width: 290px;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  padding: 40px;
+  flex-shrink: 0;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--theme-bg);
-  z-index: 100;
   overflow-y: auto;
   transition: background-color 0.3s;
+  border-right: 1px solid var(--theme-border-faint);
 }
 
 .site-title-link {
-  margin-bottom: 40px;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   text-decoration: none;
   color: var(--theme-text);
 }
 
 .site-title {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: bold;
   letter-spacing: 0.05em;
-  margin-bottom: 5px;
+  line-height: 1;
 }
 
 .site-subtitle {
@@ -786,7 +817,10 @@ h1 {
 @media (max-width: 768px) {
   .desktop-sidebar { display: none !important; }
   .mobile-header   { display: block !important; }
-  .main-content { margin-left: 0; width: 100%; padding-top: 50px; }
+  .main-content { padding-top: 0; }
+  .site-header { padding: 16px 20px 12px; }
+  .site-header .site-title { font-size: 1.4rem; }
+  .app-body { flex-direction: column; }
   .layout-masonry .grid-sizer,
   .layout-masonry .grid-item { width: calc(50% - 10px); }
   .allgallery-grid { grid-template-columns: repeat(2, 1fr); }

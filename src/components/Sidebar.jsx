@@ -156,10 +156,6 @@ const Sidebar = ({
             {/* Desktop Sidebar */}
             <aside className="desktop-sidebar">
                 <div>
-                    <Link to="/" className="site-title-link" onClick={onHomeClick}>
-                        <h1 className="site-title">TORONTO<br />GRAFFITI</h1>
-                        <p className="site-subtitle">ARCHIVE 2010-2025</p>
-                    </Link>
                     <nav>{filterSectionEls}</nav>
                     <Link
                         to="/places"
