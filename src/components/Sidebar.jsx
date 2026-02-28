@@ -87,7 +87,10 @@ const FilterSection = ({ title, options, value, onChange, placeholder, galleryKe
     const isActive = isGalleryOpen || !!value;
     return (
         <div className="filter-section">
-            <h3 className={`filter-section-title${isActive ? ' filter-section-title--active' : ''}`}>
+            <h3
+                className={`filter-section-title filter-section-title--clickable${isActive ? ' filter-section-title--active' : ''}`}
+                onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
+            >
                 {title}
             </h3>
             <div className="filter-section-controls">
@@ -98,13 +101,6 @@ const FilterSection = ({ title, options, value, onChange, placeholder, galleryKe
                     onChange={onChange}
                     placeholder={placeholder}
                 />
-                <button
-                    className="btn-primary"
-                    style={{ opacity: isGalleryOpen ? 0.6 : 1 }}
-                    onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
-                >
-                    All {title}
-                </button>
             </div>
         </div>
     );
