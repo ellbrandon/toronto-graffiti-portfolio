@@ -1,29 +1,37 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter }) => {
+    const [zoomed, setZoomed] = useState(false);
+    const zoomedRef = useRef(false);
+
+    // Keep ref in sync with state
+    useEffect(() => { zoomedRef.current = zoomed; }, [zoomed]);
+
+    // Reset zoom and lock scroll when photo changes
     useEffect(() => {
         if (!photo) return;
+        setZoomed(false);
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'unset'; };
+    }, [photo]);
 
+    // Keyboard handler — never re-registers due to zoomed changes
+    useEffect(() => {
+        if (!photo) return;
         const handleKeyDown = (e) => {
             const currentIndex = photos.findIndex(p => p.id === photo.id);
-
             if (e.key === 'Escape') {
-                onClose();
+                if (zoomedRef.current) setZoomed(false);
+                else onClose();
             } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
                 onNavigate(photos[currentIndex - 1]);
             } else if (e.key === 'ArrowRight' && currentIndex < photos.length - 1) {
                 onNavigate(photos[currentIndex + 1]);
             }
         };
-
         window.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'unset';
-        };
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, [photo, photos, onClose, onNavigate]);
 
     if (!photo) return null;
@@ -31,6 +39,21 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
     const currentIndex = photos.findIndex(p => p.id === photo.id);
     const hasPrevious = currentIndex > 0;
     const hasNext = currentIndex < photos.length - 1;
+
+    if (zoomed) {
+        return (
+            <div className="modal-zoom-overlay" onClick={() => setZoomed(false)}>
+                <button className="modal-close-btn" onClick={() => setZoomed(false)}>
+                    <X size={32} />
+                </button>
+                <img
+                    src={photo.url}
+                    alt={`${photo.what} at ${photo.where}`}
+                    className="modal-zoom-photo"
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -57,11 +80,13 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
             )}
 
             <div className="modal-content" onClick={e => e.stopPropagation()}>
-                <img
-                    src={photo.url}
-                    alt={`${photo.what} at ${photo.where}`}
-                    className="modal-photo"
-                />
+                <div className="modal-photo-wrapper" onClick={() => setZoomed(true)}>
+                    <img
+                        src={photo.url}
+                        alt={`${photo.what} at ${photo.where}`}
+                        className="modal-photo"
+                    />
+                </div>
                 <div className="modal-tags">
                     {photo.writers.map(writer => (
                         <button

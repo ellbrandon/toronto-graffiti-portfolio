@@ -549,7 +549,6 @@ h1 {
 }
 
 .gallery-item {
-  cursor: pointer;
   border-radius: 2px;
   overflow: hidden;
   position: relative;
@@ -652,11 +651,37 @@ h1 {
   gap: 20px;
 }
 
+.modal-photo-wrapper {
+  position: relative;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3Cline x1='11' y1='8' x2='11' y2='14'/%3E%3Cline x1='8' y1='11' x2='14' y2='11'/%3E%3C/svg%3E") 16 16, zoom-in;
+}
+
 .modal-photo {
   max-width: 100%;
   max-height: calc(90vh - 120px);
   object-fit: contain;
   box-shadow: 0 0 50px rgba(0,0,0,0.5);
+  display: block;
+}
+
+.modal-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.98);
+  z-index: 1100;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3Cline x1='8' y1='11' x2='14' y2='11'/%3E%3C/svg%3E") 16 16, zoom-out;
+  padding: 60px 20px 20px;
+}
+
+.modal-zoom-photo {
+  max-width: none;
+  width: auto;
+  height: auto;
+  display: block;
 }
 
 .modal-tags {
@@ -687,64 +712,9 @@ h1 {
   color: #fff;
 }
 
-/* ============================================================
-   IMAGE CURSOR
-   ============================================================ */
 .grid-item,
-.gallery-item { cursor: none; }
-
-.img-cursor {
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  transition: opacity 0.6s, transform 0.6s;
-  z-index: 10;
-}
-
-.img-cursor svg {
-  fill: transparent;
-  stroke: white;
-  stroke-width: 2.5;
-  stroke-dasharray: 160;
-  stroke-dashoffset: 160;
-  overflow: visible;
-  transition: stroke-dashoffset 0.8s ease;
-}
-
-/* crosshair arms */
-.img-cursor::before,
-.img-cursor::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 2px;
-  height: 2px;
-  background-color: white;
-  transition: width 0.8s ease, height 0.8s ease;
-  transform: translate(-50%, -50%);
-}
-
-.img-cursor::after {
-  transform: translate(-50%, -50%) rotate(90deg);
-}
-
-/* visible state */
-.img-cursor--visible {
-  opacity: 1;
-}
-
-.img-cursor--visible svg {
-  stroke-dashoffset: 0;
-}
-
-.img-cursor--visible::before,
-.img-cursor--visible::after {
-  width: 18px;
-  height: 2px;
+.gallery-item {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='16'/%3E%3Cline x1='8' y1='12' x2='16' y2='12'/%3E%3C/svg%3E") 16 16, pointer;
 }
 
 /* ============================================================

@@ -1,5 +1,3 @@
-import ImageCursor, { useCursor } from './ImageCursor';
-
 // Generic gallery showing one representative image per unique value of `field`.
 // Props:
 //   allPhotos  - full photo array
@@ -7,31 +5,20 @@ import ImageCursor, { useCursor } from './ImageCursor';
 //   values     - sorted array of unique values for that field
 //   onSelect   - called with the chosen value when a card is clicked
 
-const GalleryCard = ({ value, photo, onSelect }) => {
-    const { cursorState, onMouseMove, onMouseEnter, onMouseLeave } = useCursor();
-    return (
-        <div
-            className="gallery-item"
-            onClick={() => onSelect(value)}
-            onMouseMove={onMouseMove}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-        >
-            <div className="gallery-item-inner">
-                <img src={photo.url} alt={value} loading="lazy" decoding="async" />
-                <div className="gallery-item-overlay">
-                    <p className="gallery-item-label">{value}</p>
-                </div>
-                <ImageCursor x={cursorState.x} y={cursorState.y} visible={cursorState.visible} />
+const GalleryCard = ({ value, photo, onSelect }) => (
+    <div className="gallery-item" onClick={() => onSelect(value)}>
+        <div className="gallery-item-inner">
+            <img src={photo.url} alt={value} loading="lazy" decoding="async" />
+            <div className="gallery-item-overlay">
+                <p className="gallery-item-label">{value}</p>
             </div>
         </div>
-    );
-};
+    </div>
+);
 
 const AllGallery = ({ allPhotos, field, values, onSelect }) => {
     const cards = values.map(value => ({
         value,
-        // writers is an array; other fields are plain strings
         photo: field === 'writer'
             ? allPhotos.find(p => p.writers.includes(value))
             : allPhotos.find(p => p[field] === value),

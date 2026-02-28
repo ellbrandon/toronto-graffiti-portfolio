@@ -1,17 +1,9 @@
 import { Frown } from 'lucide-react';
 import { useLayout } from '../hooks/useLayout';
-import ImageCursor, { useCursor } from './ImageCursor';
 
 const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
-    const { cursorState, onMouseMove, onMouseEnter, onMouseLeave } = useCursor();
     return (
-        <div
-            className="grid-item"
-            onClick={() => onPhotoClick(photo)}
-            onMouseMove={onMouseMove}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-        >
+        <div className="grid-item" onClick={() => onPhotoClick(photo)}>
             <div className="img-wrapper">
                 <img
                     src={photo.url}
@@ -25,7 +17,6 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
                         <p className="overlay-title">{photo.writers.join(' · ')}</p>
                     )}
                 </div>
-                <ImageCursor x={cursorState.x} y={cursorState.y} visible={cursorState.visible} />
             </div>
         </div>
     );
