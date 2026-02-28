@@ -1,4 +1,3 @@
-import { useLayout } from '../hooks/useLayout';
 import ImageCursor, { useCursor } from './ImageCursor';
 
 // Generic gallery showing one representative image per unique value of `field`.
@@ -7,7 +6,6 @@ import ImageCursor, { useCursor } from './ImageCursor';
 //   field      - key on photo object to group by, e.g. 'writer', 'what', 'where'
 //   values     - sorted array of unique values for that field
 //   onSelect   - called with the chosen value when a card is clicked
-//   layoutMode - 'masonry' | 'grid' | 'single' | 'full'
 
 const GalleryCard = ({ value, photo, onSelect }) => {
     const { cursorState, onMouseMove, onMouseEnter, onMouseLeave } = useCursor();
@@ -30,7 +28,7 @@ const GalleryCard = ({ value, photo, onSelect }) => {
     );
 };
 
-const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
+const AllGallery = ({ allPhotos, field, values, onSelect }) => {
     const cards = values.map(value => ({
         value,
         // writers is an array; other fields are plain strings
@@ -39,17 +37,9 @@ const AllGallery = ({ allPhotos, field, values, onSelect, layoutMode }) => {
             : allPhotos.find(p => p[field] === value),
     })).filter(c => c.photo);
 
-    // Include the first value in deps so reordering (alpha/random) triggers a re-layout
-    const gridRef = useLayout('.gallery-item', '.gallery-sizer', [cards.length, cards[0]?.value, layoutMode]);
-
     return (
         <div className="allgallery-wrapper">
-            <div
-                ref={gridRef}
-                className={`layout-${layoutMode}`}
-            >
-                {layoutMode === 'masonry' && <div className="gallery-sizer" />}
-
+            <div className="allgallery-grid">
                 {cards.map(({ value, photo }) => (
                     <GalleryCard
                         key={value}

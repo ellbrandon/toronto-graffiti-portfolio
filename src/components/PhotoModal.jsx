@@ -72,18 +72,6 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
                             {writer}
                         </button>
                     ))}
-                    {[
-                        { field: 'what',  value: photo.what },
-                        { field: 'where', value: photo.where },
-                    ].filter(({ value }) => value).map(({ field, value }) => (
-                        <button
-                            key={field}
-                            className="btn-ghost"
-                            onClick={() => { onSelectFilter(field, value); onClose(); }}
-                        >
-                            {value}
-                        </button>
-                    ))}
                 </div>
             </div>
         </div>

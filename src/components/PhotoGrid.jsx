@@ -1,9 +1,8 @@
-import React from 'react';
 import { Frown } from 'lucide-react';
 import { useLayout } from '../hooks/useLayout';
 import ImageCursor, { useCursor } from './ImageCursor';
 
-const PhotoCard = ({ photo, onPhotoClick, colorMode, layoutMode }) => {
+const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
     const { cursorState, onMouseMove, onMouseEnter, onMouseLeave } = useCursor();
     return (
         <div
@@ -18,19 +17,13 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode, layoutMode }) => {
                     src={photo.url}
                     alt={`${photo.what} at ${photo.where}`}
                     className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}`}
-                    style={{ objectFit: layoutMode === 'grid' ? 'cover' : 'initial' }}
                     loading="lazy"
                     decoding="async"
                 />
                 <div className="overlay">
-                    {(photo.where || photo.writers?.length > 0) ? (
-                        <>
-                            <p className="overlay-title">{photo.where}</p>
-                            <p className="overlay-subtitle">{photo.writers?.join(' · ')}</p>
-                        </>
-                    ) : photo.description ? (
-                        <p className="overlay-title">{photo.description}</p>
-                    ) : null}
+                    {photo.writers?.length > 0 && (
+                        <p className="overlay-title">{photo.writers.join(' · ')}</p>
+                    )}
                 </div>
                 <ImageCursor x={cursorState.x} y={cursorState.y} visible={cursorState.visible} />
             </div>
@@ -38,8 +31,8 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode, layoutMode }) => {
     );
 };
 
-const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters }) => {
-    const gridRef = useLayout('.grid-item', '.grid-sizer', [photos, layoutMode]);
+const PhotoGrid = ({ photos, onPhotoClick, colorMode, onClearFilters }) => {
+    const gridRef = useLayout('.grid-item', '.grid-sizer', [photos]);
 
     if (photos.length === 0) {
         return (
@@ -59,19 +52,14 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, layoutMode, onClearFilters
 
     return (
         <div className="photo-grid-wrapper">
-            <div
-                ref={gridRef}
-                className={`layout-${layoutMode}`}
-            >
-                {layoutMode === 'masonry' && <div className="grid-sizer" />}
-
+            <div ref={gridRef} className="layout-masonry">
+                <div className="grid-sizer" />
                 {photos.map((photo) => (
                     <PhotoCard
                         key={photo.id}
                         photo={photo}
                         onPhotoClick={onPhotoClick}
                         colorMode={colorMode}
-                        layoutMode={layoutMode}
                     />
                 ))}
             </div>

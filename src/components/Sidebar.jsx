@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-    Sun, Moon, Menu, X,
-    LayoutDashboard, LayoutGrid, RectangleVertical, Maximize,
-    Search, XCircle, Pencil, SprayCan, MapPin,
-    CalendarArrowDown, CalendarArrowUp, ArrowDownAZ, ArrowUpAZ, Dices,
-} from 'lucide-react';
+import { Menu, X, Search, XCircle } from 'lucide-react';
 
 // Reusable input with optional left/right icon slots
 const IconInput = ({ iconLeft, iconRight, onClick, children }) => (
@@ -87,13 +82,12 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
     );
 };
 
-const FilterSection = ({ title, icon, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
+const FilterSection = ({ title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
     const isGalleryOpen = activeGallery === galleryKey;
     const isActive = isGalleryOpen || !!value;
     return (
         <div className="filter-section">
             <h3 className={`filter-section-title${isActive ? ' filter-section-title--active' : ''}`}>
-                {/* {icon && <span className="filter-section-icon">{icon}</span>} */}
                 {title}
             </h3>
             <div className="filter-section-controls">
@@ -116,30 +110,12 @@ const FilterSection = ({ title, icon, options, value, onChange, placeholder, gal
     );
 };
 
-const sortIcons = {
-    'date-desc': <CalendarArrowDown size={20} />,
-    'date-asc':  <CalendarArrowUp size={20} />,
-    'alpha-asc': <ArrowDownAZ size={20} />,
-    'alpha-desc':<ArrowUpAZ size={20} />,
-    'random':    <Dices size={20} />,
-
-    
-};
-
-const sortTitles = {
-    'date-desc': 'Newest first',
-    'date-asc':  'Oldest first',
-    'alpha-asc': 'A → Z',
-    'alpha-desc':'Z → A',
-    'random':    'Random order',
-};
-
 const Sidebar = ({
-    darkMode, onThemeToggle, layoutMode, onLayoutToggle, sortMode, onSortToggle,
     writers, activeWriter, onWriterChange,
     whats, activeWhat, onWhatChange,
     wheres, activeWhere, onWhereChange,
-    activeGallery, onShowGallery,
+    activeGallery, onShowGallery, onHomeClick,
+    photoCount, lastUpdated,
 }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
@@ -151,23 +127,15 @@ const Sidebar = ({
     };
 
     const filterSections = [
-        { title: 'Writers', icon: <Pencil size={18} />,   options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
-        { title: 'What',    icon: <SprayCan size={18} />, options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
-        { title: 'Where',   icon: <MapPin size={18} />,   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
+        { title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
+        { title: 'What',    options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
+        { title: 'Where',   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
     ];
-
-    const layoutIcons = {
-        masonry: <LayoutDashboard size={20} />,
-        grid:    <LayoutGrid size={20} />,
-        single:  <RectangleVertical size={20} />,
-        full:    <Maximize size={20} />,
-    };
 
     const filterSectionEls = filterSections.map(s => (
         <FilterSection
             key={s.galleryKey}
             title={s.title}
-            icon={s.icon}
             options={s.options}
             value={s.value}
             onChange={s.onChange}
@@ -179,22 +147,12 @@ const Sidebar = ({
         />
     ));
 
-    const sortBtn = (
-        <button
-            className="btn-icon"
-            onClick={onSortToggle}
-            title={sortTitles[sortMode]}
-        >
-            {sortIcons[sortMode]}
-        </button>
-    );
-
     return (
         <>
             {/* Desktop Sidebar */}
             <aside className="desktop-sidebar">
                 <div>
-                    <Link to="/" className="site-title-link">
+                    <Link to="/" className="site-title-link" onClick={onHomeClick}>
                         <h1 className="site-title">TORONTO<br />GRAFFITI</h1>
                         <p className="site-subtitle">ARCHIVE 2010-2025</p>
                     </Link>
@@ -208,23 +166,10 @@ const Sidebar = ({
                 </div>
 
                 <div className="sidebar-options">
-                    <h3 className="sidebar-options-title">Options</h3>
-                    <div className="sidebar-options-row">
-                        <button
-                            className="btn-icon"
-                            onClick={onThemeToggle}
-                            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                        >
-                            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                        </button>
-                        <button
-                            className="btn-icon"
-                            onClick={onLayoutToggle}
-                            title={`Current Layout: ${layoutMode}`}
-                        >
-                            {layoutIcons[layoutMode]}
-                        </button>
-                        {sortBtn}
+                    <div className="sidebar-stats">
+                        <p>{photoCount} Photos</p>
+                        <p>{writers.length} Writers</p>
+                        <p>Updated: {lastUpdated}</p>
                     </div>
                     <p className="sidebar-copyright">
                         &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
@@ -235,7 +180,7 @@ const Sidebar = ({
             {/* Mobile Header */}
             <header className="mobile-header">
                 <div className="mobile-header-row">
-                    <Link to="/" className="site-title-mobile">
+                    <Link to="/" className="site-title-mobile" onClick={onHomeClick}>
                         <h1>TORONTO GRAFFITI</h1>
                     </Link>
                     <button className="btn-icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -253,15 +198,6 @@ const Sidebar = ({
                         >
                             PLACES &amp; SPACES
                         </Link>
-                        <div className="mobile-options-row">
-                            <button className="btn-icon" onClick={onThemeToggle}>
-                                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-                            </button>
-                            <button className="btn-icon" onClick={onLayoutToggle}>
-                                {layoutIcons[layoutMode]}
-                            </button>
-                            {sortBtn}
-                        </div>
                     </div>
                 )}
             </header>

@@ -13,12 +13,12 @@ const applySort = (array, sortMode) => {
     }
 };
 
-const PlacesPage = ({ layoutMode, sortMode }) => {
+const PlacesPage = () => {
     const [selectedPhoto, setSelectedPhoto] = useState(null);
 
     const displayPlaces = useMemo(
-        () => applySort(allPlaces, sortMode),
-        [sortMode]
+        () => applySort(allPlaces, 'date-desc'),
+        []
     );
 
     return (
@@ -27,7 +27,6 @@ const PlacesPage = ({ layoutMode, sortMode }) => {
                 photos={displayPlaces}
                 onPhotoClick={setSelectedPhoto}
                 colorMode={true}
-                layoutMode={layoutMode}
                 onClearFilters={() => {}}
             />
             <PlacesModal
