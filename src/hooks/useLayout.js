@@ -1,18 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import Masonry from 'masonry-layout';
 import imagesLoaded from 'imagesloaded';
 
-export function useLayout(itemSelector, sizerSelector, deps = []) {
+export function useLayout(itemSelector, sizerSelector) {
     const gridRef = useRef(null);
     const masonryRef = useRef(null);
 
+    // Initialize masonry once on mount
     useEffect(() => {
         if (!gridRef.current) return;
-
-        if (masonryRef.current) {
-            masonryRef.current.destroy();
-            masonryRef.current = null;
-        }
 
         masonryRef.current = new Masonry(gridRef.current, {
             itemSelector,
@@ -22,37 +18,79 @@ export function useLayout(itemSelector, sizerSelector, deps = []) {
             transitionDuration: 0,
         });
 
-        masonryRef.current.reloadItems();
-        masonryRef.current.layout();
-
-        const imgLoad = imagesLoaded(gridRef.current);
-        imgLoad.on('progress', () => {
-            if (masonryRef.current) masonryRef.current.layout();
-        });
-
-        const t = setTimeout(() => {
-            if (masonryRef.current) masonryRef.current.layout();
-        }, 500);
-
         return () => {
-            imgLoad.off('progress');
-            clearTimeout(t);
             if (masonryRef.current) {
                 masonryRef.current.destroy();
                 masonryRef.current = null;
             }
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, deps);
+    }, []);
 
-    useEffect(() => {
+    // Full reinit — call when the photo list is replaced (filter/sort change)
+    const reinit = useCallback(() => {
+        if (!gridRef.current || !masonryRef.current) return;
+
+        masonryRef.current.reloadItems();
+        masonryRef.current.layout();
+
+        let debounceTimer = null;
+        const scheduleLayout = () => {
+            if (!masonryRef.current) return;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (masonryRef.current) masonryRef.current.layout();
+            }, 80);
+        };
+
+        const imgLoad = imagesLoaded(gridRef.current);
+        imgLoad.on('progress', scheduleLayout);
+
+        const safetyTimer = setTimeout(() => {
+            if (masonryRef.current) masonryRef.current.layout();
+        }, 1200);
+
+        // Return cleanup (caller handles if needed; not critical for reinit path)
         return () => {
-            if (masonryRef.current) {
-                masonryRef.current.destroy();
-                masonryRef.current = null;
-            }
+            imgLoad.off('progress', scheduleLayout);
+            clearTimeout(debounceTimer);
+            clearTimeout(safetyTimer);
         };
     }, []);
 
-    return gridRef;
+    // Incremental append — call with the new DOM nodes when more items are added
+    const appendItems = useCallback((newNodes) => {
+        if (!masonryRef.current || !newNodes.length) return;
+
+        masonryRef.current.appended(newNodes);
+
+        let debounceTimer = null;
+        const scheduleLayout = () => {
+            if (!masonryRef.current) return;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (masonryRef.current) masonryRef.current.layout();
+            }, 80);
+        };
+
+        // Watch only the new nodes for load events
+        newNodes.forEach(node => {
+            const imgs = node.querySelectorAll('img');
+            imgs.forEach(img => {
+                if (!img.complete) {
+                    img.addEventListener('load', scheduleLayout, { once: true });
+                    img.addEventListener('error', scheduleLayout, { once: true });
+                }
+            });
+        });
+
+        // Safety relayout
+        const safetyTimer = setTimeout(() => {
+            if (masonryRef.current) masonryRef.current.layout();
+        }, 1200);
+
+        return () => { clearTimeout(safetyTimer); };
+    }, []);
+
+    return { gridRef, reinit, appendItems };
 }

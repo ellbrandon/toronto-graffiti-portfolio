@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 // Generic gallery showing one representative image per unique value of `field`.
 // Props:
 //   allPhotos  - full photo array
@@ -5,16 +7,26 @@
 //   values     - sorted array of unique values for that field
 //   onSelect   - called with the chosen value when a card is clicked
 
-const GalleryCard = ({ value, photo, onSelect }) => (
-    <div className="gallery-item" onClick={() => onSelect(value)}>
-        <div className="gallery-item-inner">
-            <img src={photo.url} alt={value} loading="lazy" decoding="async" />
-            <div className="gallery-item-overlay">
-                <p className="gallery-item-label">{value}</p>
+const GalleryCard = ({ value, photo, onSelect }) => {
+    const [loaded, setLoaded] = useState(false);
+    return (
+        <div className="gallery-item" onClick={() => onSelect(value)}>
+            <div className="gallery-item-inner">
+                <img
+                    src={photo.url}
+                    alt={value}
+                    loading="lazy"
+                    decoding="async"
+                    className={loaded ? 'gallery-img--loaded' : ''}
+                    onLoad={() => setLoaded(true)}
+                />
+                <div className="gallery-item-overlay">
+                    <p className="gallery-item-label">{value}</p>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const AllGallery = ({ allPhotos, field, values, onSelect }) => {
     const cards = values.map(value => ({
