@@ -7,7 +7,5 @@ const API_URL = 'https://torontograff.com/photos.php';
 export async function fetchPhotos() {
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error(`Failed to load photos: ${res.status}`);
-    const data = await res.json();
-    console.log('[fetchPhotos] sample:', data.slice(0, 3));
-    return data;
+    return res.json();
 }

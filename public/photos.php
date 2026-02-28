@@ -28,6 +28,8 @@ const WHERE_TAGS = [
     'door', 'rappel', 'bando', 'subway',
 ];
 
+
+
 $whatDisplay  = [];
 foreach (WHAT_TAGS  as $t) $whatDisplay[$t]  = ucfirst($t);
 $whereDisplay = [];
@@ -85,7 +87,14 @@ if (!is_dir($photosDir)) {
     exit;
 }
 
-$files = glob($photosDir . '*.{jpg,jpeg,JPG,JPEG}', GLOB_BRACE);
+// Collect JPGs from /photos/ and any subdirectories (e.g. /photos/2025/)
+$files = [];
+$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($photosDir));
+foreach ($iterator as $file) {
+    if ($file->isFile() && preg_match('/\.(jpg|jpeg)$/i', $file->getFilename())) {
+        $files[] = $file->getPathname();
+    }
+}
 sort($files);
 
 // --- Debug mode ---
@@ -135,8 +144,20 @@ $id = 1;
 
 foreach ($files as $filepath) {
     $filename = basename($filepath);
-    $mtime    = filemtime($filepath);
-    $uploaded = date('c', $mtime);
+    // Relative path from the photos dir, e.g. "2025/DSC_0082.jpg"
+    $relativePath = ltrim(str_replace($photosDir, '', $filepath), '/\\');
+
+    // Use Exif DateTimeOriginal (when photo was taken) — fall back to file mtime
+    $uploaded = null;
+    $exif = @exif_read_data($filepath);
+    if (!empty($exif['DateTimeOriginal'])) {
+        // Exif format: "2025:10:11 19:29:00"
+        $dt = DateTime::createFromFormat('Y:m:d H:i:s', $exif['DateTimeOriginal']);
+        if ($dt) $uploaded = $dt->format('c');
+    }
+    if (!$uploaded) {
+        $uploaded = date('c', filemtime($filepath));
+    }
 
     // Read IPTC 2#025 Keywords (where Lightroom stores keyword tags)
     $keywords = [];
@@ -183,7 +204,7 @@ foreach ($files as $filepath) {
     $photos[] = [
         'id'       => $id++,
         'filename' => $filename,
-        'url'      => $baseUrl . $filename,
+        'url'      => $baseUrl . str_replace('\\', '/', $relativePath),
         'writers'  => $writers,
         'what'     => $what,
         'where'    => $where,
