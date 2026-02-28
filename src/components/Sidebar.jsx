@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Search, XCircle } from 'lucide-react';
+import { Menu, X, Search, XCircle, UserRoundPlus, SprayCan, Locate, Camera } from 'lucide-react';
 
 // Reusable input with optional left/right icon slots
 const IconInput = ({ iconLeft, iconRight, onClick, children }) => (
@@ -82,25 +82,32 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
     );
 };
 
-const FilterSection = ({ title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
+const FilterSection = ({ icon, title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
     const isGalleryOpen = activeGallery === galleryKey;
     const isActive = isGalleryOpen || !!value;
     return (
         <div className="filter-section">
-            <h3
-                className={`filter-section-title filter-section-title--clickable${isActive ? ' filter-section-title--active' : ''}`}
-                onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
-            >
-                {title}
-            </h3>
-            <div className="filter-section-controls">
-                <SearchableSelect
-                    key={value ?? '__empty__'}
-                    options={options}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                />
+            <div className="filter-section-row">
+                <div className={`filter-section-icon-col${isActive ? ' filter-section-icon-col--active' : ''}`}>
+                    {icon}
+                </div>
+                <div className="filter-section-body">
+                    <h3
+                        className={`filter-section-title filter-section-title--clickable${isActive ? ' filter-section-title--active' : ''}`}
+                        onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
+                    >
+                        {title}
+                    </h3>
+                    <div className="filter-section-controls">
+                        <SearchableSelect
+                            key={value ?? '__empty__'}
+                            options={options}
+                            value={value}
+                            onChange={onChange}
+                            placeholder={placeholder}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -123,14 +130,15 @@ const Sidebar = ({
     };
 
     const filterSections = [
-        { title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
-        { title: 'What',    options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
-        { title: 'Where',   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
+        { icon: <UserRoundPlus size={18} />, title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
+        { icon: <SprayCan      size={18} />, title: 'What',    options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
+        { icon: <Locate        size={18} />, title: 'Where',   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
     ];
 
     const filterSectionEls = filterSections.map(s => (
         <FilterSection
             key={s.galleryKey}
+            icon={s.icon}
             title={s.title}
             options={s.options}
             value={s.value}
@@ -157,6 +165,9 @@ const Sidebar = ({
                         to="/places"
                         className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
                     >
+                        <span className={`filter-section-icon-col${location.pathname === '/places' ? ' filter-section-icon-col--active' : ''}`}>
+                            <Camera size={18} />
+                        </span>
                         PLACES &amp; SPACES
                     </Link>
                 </div>
@@ -192,6 +203,7 @@ const Sidebar = ({
                             className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
                             onClick={() => setMobileMenuOpen(false)}
                         >
+                            <Camera size={18} />
                             PLACES &amp; SPACES
                         </Link>
                     </div>

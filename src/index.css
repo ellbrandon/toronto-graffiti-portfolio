@@ -100,8 +100,8 @@ h1 {
 }
 
 .main-content {
-  margin-left: 250px;
-  width: calc(100% - 250px);
+  margin-left: 290px;
+  width: calc(100% - 290px);
   height: 100vh;
   overflow-y: auto;
   background-color: var(--theme-bg);
@@ -188,7 +188,7 @@ h1 {
    SIDEBAR — Desktop
    ============================================================ */
 .desktop-sidebar {
-  width: 250px;
+  width: 290px;
   height: 100vh;
   position: fixed;
   top: 0;
@@ -227,15 +227,49 @@ h1 {
   margin-bottom: 30px;
 }
 
+.filter-section-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.filter-section-icon-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background-color: rgba(255,255,255,0.06);
+  color: var(--grey);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+[data-theme="light"] .filter-section-icon-col {
+  background-color: rgba(0,0,0,0.06);
+}
+
+.filter-section-icon-col--active {
+  color: var(--theme-text);
+  background-color: rgba(255,255,255,0.12);
+}
+
+[data-theme="light"] .filter-section-icon-col--active {
+  background-color: rgba(0,0,0,0.10);
+}
+
+.filter-section-body {
+  flex: 1;
+  min-width: 0;
+}
+
 .filter-section-title {
   font-size: 0.9rem;
   color: var(--grey);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-weight: 300;
   transition: color 0.2s;
 }
@@ -252,16 +286,10 @@ h1 {
   color: var(--theme-text);
 }
 
-.filter-section-icon {
+.places-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 20px;
-  flex-shrink: 0;
-}
-
-.places-link {
-  display: block;
+  gap: 12px;
   margin-top: 30px;
   font-size: 0.9rem;
   font-weight: 300;
