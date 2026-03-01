@@ -5,7 +5,7 @@ import { Menu, X, Search, XCircle, UserRoundPlus, SprayCan, Locate, Camera } fro
 // Reusable input with optional left/right icon slots
 const IconInput = ({ iconLeft, iconRight, onClick, children }) => (
     <div className="icon-input" onClick={onClick}>
-        {iconLeft && <span className="icon-input-slot">{iconLeft}</span>}
+        {iconLeft && <span className="icon-input-slot" aria-hidden="true">{iconLeft}</span>}
         {children}
         {iconRight && <span className="icon-input-slot">{iconRight}</span>}
     </div>
@@ -15,6 +15,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
     const containerRef = React.useRef(null);
+    const listId = React.useId();
 
     const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase()));
 
@@ -41,8 +42,12 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
     };
 
     const clearButton = value ? (
-        <button className="searchable-clear-btn" onClick={handleClear}>
-            <XCircle size={14} />
+        <button
+            className="searchable-clear-btn"
+            onClick={handleClear}
+            aria-label={`Clear ${value} filter`}
+        >
+            <XCircle size={14} aria-hidden="true" />
         </button>
     ) : null;
 
@@ -55,6 +60,10 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
             >
                 <input
                     type="text"
+                    role="combobox"
+                    aria-expanded={open}
+                    aria-autocomplete="list"
+                    aria-controls={open ? listId : undefined}
                     value={open ? query : (value || '')}
                     onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
                     onFocus={() => setOpen(true)}
@@ -64,12 +73,14 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
             </IconInput>
 
             {open && (
-                <div className="searchable-dropdown">
+                <div id={listId} className="searchable-dropdown" role="listbox">
                     {filtered.length === 0 ? (
-                        <div className="searchable-dropdown-empty">No matches</div>
+                        <div className="searchable-dropdown-empty" role="option" aria-disabled="true">No matches</div>
                     ) : filtered.map(option => (
                         <button
                             key={option}
+                            role="option"
+                            aria-selected={option === value}
                             className={`searchable-dropdown-option${option === value ? ' is-selected' : ''}`}
                             onClick={() => handleSelect(option)}
                         >
@@ -85,19 +96,27 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
 const FilterSection = ({ icon, title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
     const isGalleryOpen = activeGallery === galleryKey;
     const isActive = isGalleryOpen || !!value;
+    const galleryLabel = `Browse all ${title} gallery`;
     return (
         <div className="filter-section">
             <div className="filter-section-row">
-                <div
+                <button
                     className={`filter-section-icon-col filter-section-icon-col--clickable${isActive ? ' filter-section-icon-col--active' : ''}`}
                     onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
+                    aria-label={galleryLabel}
+                    aria-pressed={isGalleryOpen}
                 >
-                    {icon}
-                </div>
+                    <span aria-hidden="true">{icon}</span>
+                </button>
                 <div className="filter-section-body">
                     <h3
                         className={`filter-section-title filter-section-title--clickable${isActive ? ' filter-section-title--active' : ''}`}
                         onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={galleryLabel}
+                        aria-pressed={isGalleryOpen}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClearAll(); onShowGallery(galleryKey); }}}
                     >
                         {title}
                     </h3>
@@ -160,12 +179,13 @@ const Sidebar = ({
         />
     ));
 
-    const placesBtn = (extraClass = '') => (
+    const placesBtn = () => (
         <button
-            className={`places-link${placesActive ? ' places-link--active' : ''}${extraClass}`}
+            className={`places-link${placesActive ? ' places-link--active' : ''}`}
             onClick={onShowPlaces}
+            aria-pressed={placesActive}
         >
-            <span className={`filter-section-icon-col${placesActive ? ' filter-section-icon-col--active' : ''}`}>
+            <span className={`filter-section-icon-col${placesActive ? ' filter-section-icon-col--active' : ''}`} aria-hidden="true">
                 <Camera size={18} />
             </span>
             <span className="places-link-label">PLACES &amp; SPACES</span>
@@ -175,15 +195,15 @@ const Sidebar = ({
     return (
         <>
             {/* Desktop Sidebar */}
-            <aside className="desktop-sidebar">
+            <aside className="desktop-sidebar" aria-label="Filter navigation">
                 <div className="desktop-sidebar-inner">
                     <div>
-                        <nav>{filterSectionEls}</nav>
+                        <nav aria-label="Photo filters">{filterSectionEls}</nav>
                         {placesBtn()}
                     </div>
 
                     <div className="sidebar-options">
-                        <div className="sidebar-stats">
+                        <div className="sidebar-stats" aria-label="Archive statistics">
                             <p>{photoCount} Photos</p>
                             <p>{writers.length} Writers</p>
                             <p>Updated: {lastUpdated}</p>
@@ -201,18 +221,24 @@ const Sidebar = ({
                     <Link to="/" className="site-title-mobile" onClick={onHomeClick}>
                         <h1>TORONTO GRAFFITI</h1>
                     </Link>
-                    <button className="btn-icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    <button
+                        className="btn-icon"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                        aria-expanded={mobileMenuOpen}
+                        aria-controls="mobile-menu-panel"
+                    >
+                        {mobileMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
                     </button>
                 </div>
             </header>
 
             {/* Mobile Menu Panel — outside fixed header so it can scroll */}
             {mobileMenuOpen && (
-                <div className="mobile-menu-panel">
+                <nav id="mobile-menu-panel" className="mobile-menu-panel" aria-label="Photo filters">
                     {filterSectionEls}
                     {placesBtn()}
-                </div>
+                </nav>
             )}
         </>
     );

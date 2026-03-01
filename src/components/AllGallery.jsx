@@ -10,7 +10,11 @@ import { useState } from 'react';
 const GalleryCard = ({ value, photo, onSelect }) => {
     const [loaded, setLoaded] = useState(false);
     return (
-        <div className="gallery-item" onClick={() => onSelect(value)}>
+        <button
+            className="gallery-item"
+            onClick={() => onSelect(value)}
+            aria-label={`Filter by ${value}`}
+        >
             <div className="gallery-item-inner">
                 <img
                     src={photo.url}
@@ -20,11 +24,11 @@ const GalleryCard = ({ value, photo, onSelect }) => {
                     className={loaded ? 'gallery-img--loaded' : ''}
                     onLoad={() => setLoaded(true)}
                 />
-                <div className="gallery-item-overlay">
+                <div className="gallery-item-overlay" aria-hidden="true">
                     <p className="gallery-item-label">{value}</p>
                 </div>
             </div>
-        </div>
+        </button>
     );
 };
 
@@ -38,14 +42,15 @@ const AllGallery = ({ allPhotos, field, values, onSelect }) => {
 
     return (
         <div className="allgallery-wrapper">
-            <div className="allgallery-grid">
+            <div className="allgallery-grid" role="list" aria-label="Gallery categories">
                 {cards.map(({ value, photo }) => (
-                    <GalleryCard
-                        key={value}
-                        value={value}
-                        photo={photo}
-                        onSelect={onSelect}
-                    />
+                    <div key={value} role="listitem">
+                        <GalleryCard
+                            value={value}
+                            photo={photo}
+                            onSelect={onSelect}
+                        />
+                    </div>
                 ))}
             </div>
         </div>

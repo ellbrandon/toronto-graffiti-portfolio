@@ -5,19 +5,35 @@ import { useLayout } from '../hooks/useLayout';
 const INITIAL_COUNT = 48; // multiple of 3 columns
 const INCREMENT     = 30;
 
+const photoAlt = (photo) => {
+    const parts = [
+        photo.writers?.length ? photo.writers.join(', ') : null,
+        photo.what  || null,
+        photo.where ? `in ${photo.where}` : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : 'Graffiti photo';
+};
+
 const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
     const [loaded, setLoaded] = useState(false);
     return (
-        <div className="grid-item" onClick={() => onPhotoClick(photo)}>
+        <div
+            className="grid-item"
+            role="button"
+            tabIndex={0}
+            aria-label={`View photo: ${photoAlt(photo)}`}
+            onClick={() => onPhotoClick(photo)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPhotoClick(photo); } }}
+        >
             <div className="img-wrapper">
                 <img
                     src={photo.url}
-                    alt={`${photo.what} at ${photo.where}`}
+                    alt={photoAlt(photo)}
                     className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}${loaded ? ' photo-img--loaded' : ''}`}
                     decoding="async"
                     onLoad={() => setLoaded(true)}
                 />
-                <div className="overlay">
+                <div className="overlay" aria-hidden="true">
                     {(photo.writers?.length > 0 || photo.places) && (
                         <p className="overlay-title">
                             {photo.writers?.length > 0 ? photo.writers.join(' · ') : 'Places & Spaces'}

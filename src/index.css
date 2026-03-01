@@ -1,4 +1,22 @@
 /* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  padding: 8px 16px;
+  background: var(--theme-bg, #000);
+  color: var(--theme-text, #fff);
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+}
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* ============================================================
    CSS VARIABLES — theme tokens
    ============================================================ */
 :root {
@@ -292,6 +310,9 @@ h1 {
   height: 32px;
   flex-shrink: 0;
   border-radius: 8px;
+  /* button reset */
+  border: none;
+  padding: 0;
   background-color: rgba(255,255,255,0.06);
   color: var(--grey);
   transition: color 0.2s, background-color 0.2s;
@@ -677,6 +698,14 @@ h1 {
   overflow: hidden;
   position: relative;
   aspect-ratio: 5 / 4;
+  /* button reset */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 .gallery-item-inner {

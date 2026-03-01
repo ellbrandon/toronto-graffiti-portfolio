@@ -121,6 +121,7 @@ function AppContent() {
 
   return (
     <>
+      <a href="#main-content" className="skip-to-content">Skip to content</a>
       <div className="app" data-theme={lightMode ? 'light' : 'dark'}>
         <SiteHeader onHomeClick={goHome} />
         <div className="app-body">
@@ -143,18 +144,18 @@ function AppContent() {
           lastUpdated={lastUpdated}
         />
 
-        <main className="main-content">
+        <main id="main-content" className="main-content">
           <Routes>
             <Route path="/" element={
               <div className="route-wrapper">
                 {loading && (
-                  <div className="photo-grid-empty">
+                  <div className="photo-grid-empty" role="status" aria-live="polite">
                     <p className="photo-grid-empty-title">Loading photos…</p>
                   </div>
                 )}
 
                 {loadError && (
-                  <div className="photo-grid-empty">
+                  <div className="photo-grid-empty" role="alert">
                     <p className="photo-grid-empty-title">Could not load photos</p>
                     <p className="photo-grid-empty-subtitle">{loadError}</p>
                   </div>
