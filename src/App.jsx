@@ -11,7 +11,6 @@ const SiteHeader = ({ onHomeClick }) => (
   <header className="site-header">
     <Link to="/" className="site-title-link" onClick={onHomeClick}>
       <h1 className="site-title">TORONTO GRAFFITI</h1>
-      <p className="site-subtitle">ARCHIVE 2010-2026</p>
     </Link>
   </header>
 );
