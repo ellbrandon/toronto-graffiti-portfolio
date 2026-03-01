@@ -2,9 +2,81 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>graf</title>
+
+    <!-- Primary SEO -->
+    <title>Toronto Graffiti Archive | Street Art & Graffiti Photos 2010–2025</title>
+    <meta name="description" content="The most comprehensive archive of Toronto graffiti and street art photography, documenting writers, pieces, throws, handstyles and more from 2010 to 2025." />
+    <meta name="keywords" content="toronto graffiti, toronto street art, graffiti archive, toronto graffiti writers, graffiti photography, toronto graffiti pieces, graffiti throws, handstyles, graffiti history toronto" />
+    <meta name="author" content="Toronto Graffiti Archive" />
+    <link rel="canonical" href="https://torontograff.com/" />
+
+    <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://torontograff.com/" />
+    <meta property="og:site_name" content="Toronto Graffiti Archive" />
+    <meta property="og:title" content="Toronto Graffiti Archive | Street Art & Graffiti Photos 2010–2025" />
+    <meta property="og:description" content="The most comprehensive archive of Toronto graffiti and street art photography, documenting writers, pieces, throws, handstyles and more from 2010 to 2025." />
+    <meta property="og:locale" content="en_CA" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Toronto Graffiti Archive | Street Art & Graffiti Photos 2010–2025" />
+    <meta name="twitter:description" content="The most comprehensive archive of Toronto graffiti and street art photography, documenting writers, pieces, throws, handstyles and more from 2010 to 2025." />
+
+    <!-- Geo / Regional -->
+    <meta name="geo.region" content="CA-ON" />
+    <meta name="geo.placename" content="Toronto, Ontario, Canada" />
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Structured Data: WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Toronto Graffiti Archive",
+      "alternateName": "Toronto Graffiti",
+      "url": "https://torontograff.com/",
+      "description": "Comprehensive photographic archive of Toronto graffiti and street art from 2010 to 2025, documenting writers, styles and locations across the city.",
+      "inLanguage": "en-CA",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://torontograff.com/?writer={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Structured Data: ImageGallery -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ImageGallery",
+      "name": "Toronto Graffiti Archive",
+      "description": "A photographic archive of Toronto graffiti art spanning 2010 to 2025, including pieces, throws, handstyles, characters, rollers and more across alleys, tunnels, bridges and freight.",
+      "url": "https://torontograff.com/",
+      "about": {
+        "@type": "Thing",
+        "name": "Graffiti",
+        "sameAs": "https://en.wikipedia.org/wiki/Graffiti"
+      },
+      "locationCreated": {
+        "@type": "City",
+        "name": "Toronto",
+        "containedInPlace": {
+          "@type": "AdministrativeArea",
+          "name": "Ontario, Canada"
+        }
+      }
+    }
+    </script>
+
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
   </head>
   <body>
     <div id="root"></div>
