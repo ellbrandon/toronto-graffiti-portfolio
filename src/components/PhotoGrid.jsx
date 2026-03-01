@@ -16,6 +16,7 @@ const photoAlt = (photo) => {
 
 const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
     const [loaded, setLoaded] = useState(false);
+    const isPortrait = photo.width && photo.height && photo.height > photo.width;
     return (
         <div
             className="grid-item"
@@ -25,7 +26,7 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
             onClick={() => onPhotoClick(photo)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPhotoClick(photo); } }}
         >
-            <div className="img-wrapper">
+            <div className={`img-wrapper${isPortrait ? ' img-wrapper--portrait' : ''}`}>
                 <img
                     src={photo.url}
                     alt={photoAlt(photo)}

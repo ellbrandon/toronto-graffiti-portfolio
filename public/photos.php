@@ -10,7 +10,7 @@
  * - Known "where" values matched case-insensitively.
  * - Everything else becomes a writer name.
  *
- * Returns: [{id, filename, url, writers, what, where, uploaded}]
+ * Returns: [{id, filename, url, writers, what, where, places, uploaded, width, height}]
  */
 
 header('Content-Type: application/json');
@@ -136,6 +136,35 @@ if (isset($_GET['debug']) && $files) {
         exit;
     }
 
+    // ?debug=dims → show width/height resolved for every file
+    if ($_GET['debug'] === 'dims') {
+        $out = [];
+        foreach ($files as $fp) {
+            $e = @exif_read_data($fp);
+            $w = $e['EXIF_IMAGE_WIDTH']  ?? $e['ImageWidth']  ?? null;
+            $h = $e['EXIF_IMAGE_LENGTH'] ?? $e['ImageLength'] ?? null;
+            // Also try getimagesize as fallback
+            if (!$w || !$h) {
+                $sz = @getimagesize($fp);
+                if ($sz) { $w = $sz[0]; $h = $sz[1]; }
+            }
+            $out[] = ['file' => basename($fp), 'width' => $w, 'height' => $h];
+        }
+        echo json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        exit;
+    }
+
+    // ?debug=exif → dump all EXIF keys for first file (to check dimension key names)
+    if ($_GET['debug'] === 'exif') {
+        $fp   = $files[0];
+        $exif = @exif_read_data($fp);
+        echo json_encode([
+            'file' => basename($fp),
+            'exif' => $exif ?: null,
+        ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        exit;
+    }
+
     // Default: single file detail
     $fp  = $files[0];
     $xmp = readXmp($fp);
@@ -166,6 +195,8 @@ foreach ($files as $filepath) {
 
     // Use Exif DateTimeOriginal (when photo was taken) — fall back to file mtime
     $uploaded = null;
+    $imgWidth  = null;
+    $imgHeight = null;
     $exif = @exif_read_data($filepath);
     if (!empty($exif['DateTimeOriginal'])) {
         // Exif format: "2025:10:11 19:29:00"
@@ -174,6 +205,19 @@ foreach ($files as $filepath) {
     }
     if (!$uploaded) {
         $uploaded = date('c', filemtime($filepath));
+    }
+    // Image dimensions for orientation detection on the client.
+    // getimagesize() is the most reliable source of actual pixel dimensions.
+    $sz = @getimagesize($filepath);
+    if ($sz) {
+        $imgWidth  = (int) $sz[0];
+        $imgHeight = (int) $sz[1];
+        // EXIF Orientation 5-8 means the image is stored rotated 90/270°,
+        // so we need to swap width and height to get the display dimensions.
+        $orientation = $exif['Orientation'] ?? 1;
+        if (in_array($orientation, [5, 6, 7, 8], true)) {
+            [$imgWidth, $imgHeight] = [$imgHeight, $imgWidth];
+        }
     }
 
     // Read IPTC 2#025 Keywords (where Lightroom stores keyword tags)
@@ -234,6 +278,8 @@ foreach ($files as $filepath) {
         'where'    => $where,
         'places'   => $places,
         'uploaded' => $uploaded,
+        'width'    => $imgWidth,
+        'height'   => $imgHeight,
     ];
 }
 
