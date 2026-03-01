@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useSearchParams } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import AllGallery from './components/AllGallery';
@@ -19,11 +19,10 @@ const applySort = (array) =>
   [...array].sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));
 
 function AppContent() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Dark mode: always dark unless ?theme=light is in the URL
-  const lightMode = new URLSearchParams(location.search).get('theme') === 'light';
+  const lightMode = searchParams.get('theme') === 'light';
 
   // --- Async photo loading ---
   const [basePhotos, setBasePhotos] = useState([]);
@@ -36,9 +35,16 @@ function AppContent() {
       .catch(err => { setLoadError(err.message); setLoading(false); });
   }, []);
 
-  const [activeFilters, setActiveFilters] = useState({ writer: null, what: null, where: null });
-  const [activeGallery, setActiveGallery] = useState(null);
-  const [placesActive, setPlacesActive] = useState(false);
+  // View state derived from URL — no useState for these
+  const activeFilters = {
+    writer: searchParams.get('writer'),
+    what:   searchParams.get('what'),
+    where:  searchParams.get('where'),
+  };
+  const viewParam     = searchParams.get('view');
+  const activeGallery = viewParam?.startsWith('gallery-') ? viewParam.slice('gallery-'.length) : null;
+  const placesActive  = viewParam === 'places';
+
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   // Fixed ordered lists — define display order in dropdowns and AllGallery
@@ -102,19 +108,54 @@ function AppContent() {
   useEffect(() => {
     const scroller = document.querySelector('.main-content') ?? window;
     scroller.scrollTo({ top: 0, behavior: 'instant' });
-  }, [activeFilters, activeGallery, placesActive]);
+  }, [searchParams]);
 
-  const clearAllFilters = () => setActiveFilters({ writer: null, what: null, where: null });
-
-  const goHome = () => { clearAllFilters(); setActiveGallery(null); setPlacesActive(false); navigate('/'); };
-
-  const handleFilterChange = (type, value) => {
-    setActiveFilters(prev => ({ ...prev, [type]: value === prev[type] ? null : value }));
+  // Build a clean params object, preserving ?theme and omitting null values
+  const buildParams = (overrides = {}) => {
+    const next = {};
+    if (searchParams.get('theme')) next.theme = searchParams.get('theme');
+    Object.entries(overrides).forEach(([k, v]) => { if (v != null) next[k] = v; });
+    return next;
   };
 
-  const handleGallerySelect = (field, value) => { handleFilterChange(field, value); setActiveGallery(null); navigate('/'); };
-  const handleShowGallery   = (field) => { setActiveGallery(prev => prev === field ? null : field); setPlacesActive(false); navigate('/'); };
-  const handleShowPlaces    = () => { setPlacesActive(prev => !prev); setActiveGallery(null); clearAllFilters(); navigate('/'); };
+  const goHome = () => setSearchParams(buildParams());
+
+  const handleFilterChange = (type, value, { closeView = false } = {}) => {
+    const current = searchParams.get(type);
+    const next    = value === current ? null : value;
+    if (next === current) return;
+    setSearchParams(buildParams({
+      writer: activeFilters.writer,
+      what:   activeFilters.what,
+      where:  activeFilters.where,
+      view:   closeView ? null : viewParam,
+      [type]: next,
+    }));
+  };
+
+  const handleGallerySelect = (field, value) =>
+    setSearchParams(buildParams({
+      writer: activeFilters.writer,
+      what:   activeFilters.what,
+      where:  activeFilters.where,
+      [field]: value,
+    }));
+
+  const handleShowPlaces = () => {
+    const nextView = placesActive ? null : 'places';
+    setSearchParams(buildParams({ view: nextView }));
+  };
+
+  // Atomic: clear filters + open gallery in one history push (used by sidebar icon/title clicks)
+  const handleClearAndShowGallery = (field) => {
+    const nextView = activeGallery === field ? null : `gallery-${field}`;
+    setSearchParams(buildParams({ view: nextView }));
+  };
+
+  // Close modal on any URL change (Back/Forward while modal open)
+  useEffect(() => {
+    setSelectedPhoto(null);
+  }, [searchParams]);
 
   // Active photos for the modal (places or main grid)
   const modalPhotos = placesActive ? placesPhotos : displayPhotos;
@@ -128,15 +169,15 @@ function AppContent() {
         <Sidebar
           writers={writers}
           activeWriter={activeFilters.writer}
-          onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); setPlacesActive(false); navigate('/'); }}
+          onWriterChange={(val) => handleFilterChange('writer', val, { closeView: true })}
           whats={whats}
           activeWhat={activeFilters.what}
-          onWhatChange={(val) => { handleFilterChange('what', val); setActiveGallery(null); setPlacesActive(false); navigate('/'); }}
+          onWhatChange={(val) => handleFilterChange('what', val, { closeView: true })}
           wheres={wheres}
           activeWhere={activeFilters.where}
-          onWhereChange={(val) => { handleFilterChange('where', val); setActiveGallery(null); setPlacesActive(false); navigate('/'); }}
+          onWhereChange={(val) => handleFilterChange('where', val, { closeView: true })}
           activeGallery={activeGallery}
-          onShowGallery={handleShowGallery}
+          onClearAndShowGallery={handleClearAndShowGallery}
           onHomeClick={goHome}
           placesActive={placesActive}
           onShowPlaces={handleShowPlaces}
@@ -172,8 +213,8 @@ function AppContent() {
                   ) : activeGallery ? (
                     <AllGallery
                       allPhotos={basePhotos}
-                      field={galleryConfig[activeGallery].field}
-                      values={galleryConfig[activeGallery].values}
+                      field={galleryConfig[activeGallery]?.field}
+                      values={galleryConfig[activeGallery]?.values ?? []}
                       onSelect={(value) => handleGallerySelect(activeGallery, value)}
                     />
                   ) : (
@@ -197,7 +238,7 @@ function AppContent() {
           onClose={() => setSelectedPhoto(null)}
           photos={modalPhotos}
           onNavigate={setSelectedPhoto}
-          onSelectFilter={(field, value) => { setActiveFilters({ writer: null, what: null, where: null, [field]: value }); setActiveGallery(null); setPlacesActive(false); }}
+          onSelectFilter={(field, value) => setSearchParams(buildParams({ [field]: value }))}
         />
       </div>
     </>

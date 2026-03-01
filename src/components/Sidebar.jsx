@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Menu, X, Search, XCircle, UserRoundPlus, SprayCan, Locate, Camera } from 'lucide-react';
 
 // Reusable input with optional left/right icon slots
@@ -139,23 +139,16 @@ const Sidebar = ({
     writers, activeWriter, onWriterChange,
     whats, activeWhat, onWhatChange,
     wheres, activeWhere, onWhereChange,
-    activeGallery, onShowGallery, onHomeClick,
+    activeGallery, onClearAndShowGallery, onHomeClick,
     placesActive, onShowPlaces,
     photoCount, lastUpdated,
 }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const location = useLocation();
 
-    // Close mobile menu whenever filters, gallery, places, or route changes
+    // Close mobile menu whenever filters, gallery, or places change
     React.useEffect(() => {
         setMobileMenuOpen(false);
-    }, [activeWriter, activeWhat, activeWhere, activeGallery, placesActive, location.pathname]);
-
-    const clearAll = () => {
-        onWriterChange(null);
-        onWhatChange(null);
-        onWhereChange(null);
-    };
+    }, [activeWriter, activeWhat, activeWhere, activeGallery, placesActive]);
 
     const filterSections = [
         { icon: <UserRoundPlus size={18} />, title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
@@ -174,8 +167,8 @@ const Sidebar = ({
             placeholder={s.placeholder}
             galleryKey={s.galleryKey}
             activeGallery={activeGallery}
-            onShowGallery={onShowGallery}
-            onClearAll={clearAll}
+            onShowGallery={onClearAndShowGallery}
+            onClearAll={() => {}}
         />
     ));
 
