@@ -371,8 +371,7 @@ h1 {
   letter-spacing: 0;
 }
 
-.filter-section-title--clickable:hover::after,
-.filter-section-title--active::after {
+.filter-section-title--clickable:hover::after {
   display: inline;
 }
 
@@ -416,8 +415,7 @@ h1 {
   letter-spacing: 0;
 }
 
-.places-link:hover .places-link-label::after,
-.places-link--active .places-link-label::after {
+.places-link:hover .places-link-label::after {
   display: inline;
 }
 
