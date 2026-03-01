@@ -619,8 +619,9 @@ h1 {
 .img-wrapper {
   position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 16 / 9;
   background-color: #111;
+  overflow: hidden;
 }
 
 .photo-img {
@@ -630,6 +631,7 @@ h1 {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
 }
 
 .photo-img--loaded {
@@ -666,7 +668,10 @@ h1 {
 .overlay-subtitle { font-size: 0.8rem; color: #ccc; }
 
 /* Layout mode containers */
+/* Items are invisible until masonry fires layoutComplete, preventing CLS */
 .layout-masonry { /* Masonry positions items via JS */ }
+.layout-masonry .grid-item      { opacity: 0; transition: opacity 0.3s ease; }
+.layout-masonry.masonry-ready .grid-item { opacity: 1; }
 
 /* Layout mode items */
 .layout-masonry .grid-item {

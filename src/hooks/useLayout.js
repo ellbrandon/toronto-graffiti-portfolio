@@ -19,6 +19,11 @@ export function useLayout(itemSelector, sizerSelector) {
                 percentPosition: true,
                 gutter: 20,
                 transitionDuration: 0,
+                // Keep items hidden until first layout is complete to prevent CLS
+                initLayout: false,
+            });
+            masonryRef.current.once('layoutComplete', () => {
+                if (gridRef.current) gridRef.current.classList.add('masonry-ready');
             });
             masonryRef.current.layout();
         }, 50);
@@ -36,6 +41,12 @@ export function useLayout(itemSelector, sizerSelector) {
     // Full reinit — call when the photo list is replaced (filter/sort change)
     const reinit = useCallback(() => {
         if (!gridRef.current || !masonryRef.current) return;
+
+        // Hide items while masonry repositions, reveal on layoutComplete
+        gridRef.current.classList.remove('masonry-ready');
+        masonryRef.current.once('layoutComplete', () => {
+            if (gridRef.current) gridRef.current.classList.add('masonry-ready');
+        });
 
         masonryRef.current.reloadItems();
         masonryRef.current.layout();
