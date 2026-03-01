@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useSearchParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
 import { fetchPhotos } from './data/photos';
+import CopyrightPage from './components/CopyrightPage';
 
 const SiteHeader = ({ onHomeClick }) => (
   <header className="site-header">
@@ -20,6 +21,9 @@ const applySort = (array) =>
 
 function AppContent() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const onCopyright = location.pathname === '/copyright';
 
   // Dark mode: always dark unless ?theme=light is in the URL
   const lightMode = searchParams.get('theme') === 'light';
@@ -118,13 +122,23 @@ function AppContent() {
     return next;
   };
 
-  const goHome = () => setSearchParams(buildParams());
+  // If we're on /copyright, navigate to / with the given params; otherwise just update params
+  const goTo = (params) => {
+    if (onCopyright) {
+      const qs = new URLSearchParams(params).toString();
+      navigate('/' + (qs ? '?' + qs : ''));
+    } else {
+      setSearchParams(params);
+    }
+  };
+
+  const goHome = () => goTo(buildParams());
 
   const handleFilterChange = (type, value, { closeView = false } = {}) => {
     const current = searchParams.get(type);
     const next    = value === current ? null : value;
     if (next === current) return;
-    setSearchParams(buildParams({
+    goTo(buildParams({
       writer: activeFilters.writer,
       what:   activeFilters.what,
       where:  activeFilters.where,
@@ -134,7 +148,7 @@ function AppContent() {
   };
 
   const handleGallerySelect = (field, value) =>
-    setSearchParams(buildParams({
+    goTo(buildParams({
       writer: activeFilters.writer,
       what:   activeFilters.what,
       where:  activeFilters.where,
@@ -143,13 +157,13 @@ function AppContent() {
 
   const handleShowPlaces = () => {
     const nextView = placesActive ? null : 'places';
-    setSearchParams(buildParams({ view: nextView }));
+    goTo(buildParams({ view: nextView }));
   };
 
   // Atomic: clear filters + open gallery in one history push (used by sidebar icon/title clicks)
   const handleClearAndShowGallery = (field) => {
     const nextView = activeGallery === field ? null : `gallery-${field}`;
-    setSearchParams(buildParams({ view: nextView }));
+    goTo(buildParams({ view: nextView }));
   };
 
   // Close modal on any URL change (Back/Forward while modal open)
@@ -228,6 +242,7 @@ function AppContent() {
                 )}
               </div>
             } />
+            <Route path="/copyright" element={<CopyrightPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
@@ -238,7 +253,7 @@ function AppContent() {
           onClose={() => setSelectedPhoto(null)}
           photos={modalPhotos}
           onNavigate={setSelectedPhoto}
-          onSelectFilter={(field, value) => setSearchParams(buildParams({ [field]: value }))}
+          onSelectFilter={(field, value) => goTo(buildParams({ [field]: value }))}
         />
       </div>
     </>

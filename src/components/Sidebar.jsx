@@ -201,9 +201,9 @@ const Sidebar = ({
                             <p>{writers.length} Writers</p>
                             <p>Updated: {lastUpdated}</p>
                         </div>
-                        <p className="sidebar-copyright">
+                        <Link to="/copyright" className="sidebar-copyright">
                             &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
-                        </p>
+                        </Link>
                     </div>
                 </div>
             </aside>
@@ -231,6 +231,9 @@ const Sidebar = ({
                 <nav id="mobile-menu-panel" className="mobile-menu-panel" aria-label="Photo filters">
                     {filterSectionEls}
                     {placesBtn()}
+                    <Link to="/copyright" className="mobile-copyright" onClick={() => setMobileMenuOpen(false)}>
+                        &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
+                    </Link>
                 </nav>
             )}
         </>

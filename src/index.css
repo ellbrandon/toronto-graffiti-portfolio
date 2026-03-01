@@ -388,7 +388,6 @@ h1 {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 24px;
   font-size: 0.9rem;
   font-weight: 300;
   letter-spacing: 0.1em;
@@ -449,12 +448,6 @@ h1 {
 }
 
 
-.sidebar-copyright {
-  font-size: 0.6rem;
-  color: var(--theme-text-muted);
-  line-height: 1.5;
-}
-
 /* ============================================================
    SIDEBAR — Mobile header
    ============================================================ */
@@ -498,8 +491,10 @@ h1 {
   background-color: var(--theme-bg);
   z-index: 190;
   overflow-y: auto;
-  padding: 20px 20px 40px;
+  padding: 20px;
   border-top: 1px solid var(--theme-border-faint);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Always show text content inside the mobile panel */
@@ -685,6 +680,14 @@ h1 {
   width: 100%;
 }
 
+/* Transparent shield over images — blocks right-click / drag-to-save */
+.img-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .overlay {
   position: absolute;
   bottom: 0;
@@ -774,6 +777,14 @@ h1 {
 }
 
 
+/* Transparent shield over gallery thumbnails */
+.gallery-item-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .gallery-item-overlay {
   position: absolute;
   bottom: 0;
@@ -857,6 +868,14 @@ h1 {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3Cline x1='11' y1='8' x2='11' y2='14'/%3E%3Cline x1='8' y1='11' x2='14' y2='11'/%3E%3C/svg%3E") 16 16, zoom-in;
 }
 
+/* Transparent shield over modal image */
+.modal-photo-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .modal-photo {
   max-width: 100%;
   max-height: calc(90vh - 120px);
@@ -916,6 +935,122 @@ h1 {
 .grid-item,
 .gallery-item {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='8' x2='12' y2='16'/%3E%3Cline x1='8' y1='12' x2='16' y2='12'/%3E%3C/svg%3E") 16 16, pointer;
+}
+
+/* ============================================================
+   COPYRIGHT PAGE
+   ============================================================ */
+.copyright-page {
+  max-width: 680px;
+}
+
+.copyright-page-title {
+  font-size: 1.6rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin-bottom: 40px;
+  color: #ededed;
+}
+
+.copyright-page-body {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.copyright-section h3 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--theme-text-muted);
+  margin-bottom: 12px;
+}
+
+.copyright-section p,
+.copyright-section li {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: #ededed;
+  font-weight: 300;
+}
+
+.copyright-section ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.copyright-section ul li::before {
+  content: '— ';
+  color: var(--theme-text-muted);
+}
+
+.copyright-contact-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: #ededed;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.copyright-contact-link:hover {
+  color: #fff;
+}
+
+.copyright-inline-link {
+  color: #ededed;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.copyright-inline-link:hover {
+  color: #fff;
+}
+
+.copyright-footer {
+  font-size: 0.7rem;
+  color: var(--theme-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding-top: 20px;
+  border-top: 1px solid var(--theme-border-faint);
+}
+
+.sidebar-copyright {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--theme-text-muted);
+  line-height: 1.5;
+  transition: color 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sidebar-copyright:hover {
+  color: var(--theme-text);
+}
+
+.mobile-copyright {
+  display: block;
+  margin-top: auto;
+  padding-top: 32px;
+  font-size: 0.7rem;
+  color: var(--theme-text-muted);
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mobile-copyright:hover {
+  color: var(--theme-text);
 }
 
 /* ============================================================
