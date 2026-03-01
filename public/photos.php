@@ -16,22 +16,36 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-// --- Canonical tag lists (lowercase for matching) ---
-const WHAT_TAGS = [
-    'character', 'handstyle', 'hollow', 'throw', 'extinguisher',
-    'piece', 'roller', 'detail', 'nocturnal', 'stich', 'pano', 'slap',
+// --- Canonical what tags: singular => plural display label ---
+// Both singular and plural forms in tags are accepted and normalized to the plural label.
+const WHAT_SINGULAR_TO_PLURAL = [
+    'handstyle'    => 'Handstyles',
+    'hollow'       => 'Hollows',
+    'throw'        => 'Throws',
+    'piece'        => 'Pieces',
+    'roller'       => 'Rollers',
+    'extinguisher' => 'Extinguishers',
+    'rappel'       => 'Rappels',
+    'character'    => 'Characters',
+    'detail'       => 'Details',
+    'wall wisdom'  => 'Wall Wisdoms',
+    'slap'         => 'Slaps',
+    'can'          => 'Cans',
 ];
 
 const WHERE_TAGS = [
-    'urbex', 'tunnel', 'rooftop', 'bridge', 'trackside',
-    'alley', 'highway', 'river', 'freight', 'truck',
-    'door', 'rappel', 'bando', 'subway',
+    'alley', 'bridge', 'tunnel', 'trackside', 'freight',
+    'truck', 'door', 'river', 'gulley', 'highway',
+    'rooftop', 'subway', 'bando', 'urbex',
 ];
 
+// Build what lookup: accepts both singular and plural (lowercase) → plural display label
+$whatDisplay = [];
+foreach (WHAT_SINGULAR_TO_PLURAL as $singular => $plural) {
+    $whatDisplay[$singular]          = $plural;           // e.g. 'throw'  → 'Throws'
+    $whatDisplay[strtolower($plural)] = $plural;           // e.g. 'throws' → 'Throws'
+}
 
-
-$whatDisplay  = [];
-foreach (WHAT_TAGS  as $t) $whatDisplay[$t]  = ucfirst($t);
 $whereDisplay = [];
 foreach (WHERE_TAGS as $t) $whereDisplay[$t] = ucfirst($t);
 

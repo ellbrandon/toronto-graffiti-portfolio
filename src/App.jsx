@@ -41,10 +41,28 @@ function AppContent() {
   const [activeGallery, setActiveGallery] = useState(null);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
+  // Fixed ordered lists — define display order in dropdowns and AllGallery
+  const WHAT_ORDER  = [
+    'Handstyles', 'Hollows', 'Throws', 'Pieces', 'Rollers',
+    'Extinguishers', 'Rappels', 'Characters', 'Details', 'Wall Wisdoms',
+    'Slaps', 'Cans',
+  ];
+  const WHERE_ORDER = [
+    'Alley', 'Bridge', 'Tunnel', 'Trackside', 'Freight',
+    'Truck', 'Door', 'River', 'Gulley', 'Highway',
+    'Rooftop', 'Subway', 'Bando', 'Urbex',
+  ];
+
   // Unique filter values — writers are flattened from arrays
   const writers = useMemo(() => [...new Set(basePhotos.flatMap(p => p.writers))].sort(), [basePhotos]);
-  const whats   = useMemo(() => [...new Set(basePhotos.map(p => p.what).filter(Boolean))].sort(),   [basePhotos]);
-  const wheres  = useMemo(() => [...new Set(basePhotos.map(p => p.where).filter(Boolean))].sort(),  [basePhotos]);
+  const whats   = useMemo(() => {
+    const present = new Set(basePhotos.map(p => p.what).filter(Boolean));
+    return WHAT_ORDER.filter(w => present.has(w));
+  }, [basePhotos]);
+  const wheres  = useMemo(() => {
+    const present = new Set(basePhotos.map(p => p.where).filter(Boolean));
+    return WHERE_ORDER.filter(w => present.has(w));
+  }, [basePhotos]);
 
   const lastUpdated = useMemo(() => {
     if (!basePhotos.length) return '';
@@ -63,11 +81,11 @@ function AppContent() {
     return applySort(filtered);
   }, [basePhotos, activeFilters]);
 
-  // AllGallery: always alphabetical
+  // AllGallery: writers alphabetical, what/where use fixed order
   const galleryConfig = useMemo(() => ({
     writer: { field: 'writer', values: [...writers].sort((a, b) => a.localeCompare(b)) },
-    what:   { field: 'what',   values: [...whats].sort((a, b) => a.localeCompare(b)) },
-    where:  { field: 'where',  values: [...wheres].sort((a, b) => a.localeCompare(b)) },
+    what:   { field: 'what',   values: whats },
+    where:  { field: 'where',  values: wheres },
   }), [writers, whats, wheres]);
 
   // Scroll to top on any filter or gallery change
