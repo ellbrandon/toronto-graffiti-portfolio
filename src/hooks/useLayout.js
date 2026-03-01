@@ -10,15 +10,21 @@ export function useLayout(itemSelector, sizerSelector) {
     useEffect(() => {
         if (!gridRef.current) return;
 
-        masonryRef.current = new Masonry(gridRef.current, {
-            itemSelector,
-            columnWidth: sizerSelector,
-            percentPosition: true,
-            gutter: 20,
-            transitionDuration: 0,
-        });
+        // Defer init slightly so the container has its final CSS dimensions
+        const initTimer = setTimeout(() => {
+            if (!gridRef.current) return;
+            masonryRef.current = new Masonry(gridRef.current, {
+                itemSelector,
+                columnWidth: sizerSelector,
+                percentPosition: true,
+                gutter: 20,
+                transitionDuration: 0,
+            });
+            masonryRef.current.layout();
+        }, 50);
 
         return () => {
+            clearTimeout(initTimer);
             if (masonryRef.current) {
                 masonryRef.current.destroy();
                 masonryRef.current = null;

@@ -137,7 +137,7 @@ function AppContent() {
                       photos={displayPhotos}
                       onPhotoClick={setSelectedPhoto}
                       colorMode={true}
-                      onClearFilters={clearAllFilters}
+                      onClearFilters={() => { clearAllFilters(); setActiveGallery(null); navigate('/'); }}
                     />
                   )
                 )}

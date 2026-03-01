@@ -39,8 +39,8 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, onClearFilters }) => {
         scroller.scrollTo({ top: 0, behavior: 'instant' });
         setVisibleCount(INITIAL_COUNT);
         prevVisibleCount.current = INITIAL_COUNT;
-        // Reinit after React has flushed the new DOM
-        const t = setTimeout(() => reinit(), 0);
+        // Reinit after React has flushed the new DOM and masonry has initialised
+        const t = setTimeout(() => reinit(), 80);
         return () => clearTimeout(t);
     }, [photos, reinit]);
 
@@ -80,39 +80,38 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, onClearFilters }) => {
 
     const visiblePhotos = photos.slice(0, visibleCount);
 
-    if (photos.length === 0) {
-        return (
-            <div className="photo-grid-empty">
-                <Frown size={48} strokeWidth={1} style={{ color: 'var(--grey)' }} />
-                <p className="photo-grid-empty-title">No photos found</p>
-                <p className="photo-grid-empty-subtitle">
-                    No images match the current filters.<br />
-                    Try adjusting your search or clearing a filter.
-                </p>
-                <button className="btn-primary" style={{ width: 'auto' }} onClick={onClearFilters}>
-                    Clear all filters
-                </button>
-            </div>
-        );
-    }
-
     return (
-        <div className="photo-grid-wrapper">
-            <div ref={gridRef} className="layout-masonry">
-                <div className="grid-sizer" />
-                {visiblePhotos.map((photo) => (
-                    <PhotoCard
-                        key={photo.id}
-                        photo={photo}
-                        onPhotoClick={onPhotoClick}
-                        colorMode={colorMode}
-                    />
-                ))}
-            </div>
-            {visibleCount < photos.length && (
-                <div ref={sentinelRef} className="photo-grid-sentinel" />
+        <>
+            {photos.length === 0 && (
+                <div className="photo-grid-empty">
+                    <Frown size={48} strokeWidth={1} style={{ color: 'var(--grey)' }} />
+                    <p className="photo-grid-empty-title">No photos found</p>
+                    <p className="photo-grid-empty-subtitle">
+                        No images match the current filters.<br />
+                        Try adjusting your search or clearing a filter.
+                    </p>
+                    <button className="btn-primary" style={{ width: 'auto' }} onClick={onClearFilters}>
+                        Clear all filters
+                    </button>
+                </div>
             )}
-        </div>
+            <div className="photo-grid-wrapper" style={photos.length === 0 ? { display: 'none' } : undefined}>
+                <div ref={gridRef} className="layout-masonry">
+                    <div className="grid-sizer" />
+                    {visiblePhotos.map((photo) => (
+                        <PhotoCard
+                            key={photo.id}
+                            photo={photo}
+                            onPhotoClick={onPhotoClick}
+                            colorMode={colorMode}
+                        />
+                    ))}
+                </div>
+                {visibleCount < photos.length && (
+                    <div ref={sentinelRef} className="photo-grid-sentinel" />
+                )}
+            </div>
+        </>
     );
 };
 
