@@ -255,7 +255,7 @@ h1 {
 }
 
 .desktop-sidebar:hover {
-  width: 240px;
+  width: 250px;
   box-shadow: 4px 0 24px rgba(0,0,0,0.4);
 }
 
@@ -268,7 +268,7 @@ h1 {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 20px;
-  width: 240px; /* fixed width so content doesn't reflow during animate */
+  width: 250px; /* fixed width so content doesn't reflow during animate */
 }
 
 .site-title-link {
@@ -361,6 +361,19 @@ h1 {
 
 .filter-section-title--clickable {
   cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.filter-section-title--clickable::after {
+  display: none;
+  content: ' >';
+  letter-spacing: 0;
+}
+
+.filter-section-title--clickable:hover::after,
+.filter-section-title--active::after {
+  display: inline;
 }
 
 .filter-section-title--clickable:hover {
@@ -393,7 +406,20 @@ h1 {
 /* Text label beside the camera icon — hidden when collapsed */
 .places-link-label {
   opacity: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
   transition: opacity 0.15s ease;
+}
+
+.places-link-label::after {
+  display: none;
+  content: ' >';
+  letter-spacing: 0;
+}
+
+.places-link:hover .places-link-label::after,
+.places-link--active .places-link-label::after {
+  display: inline;
 }
 
 .desktop-sidebar:hover .places-link-label {
