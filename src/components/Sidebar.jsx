@@ -123,6 +123,11 @@ const Sidebar = ({
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
 
+    // Close mobile menu whenever filters, gallery, or route changes
+    React.useEffect(() => {
+        setMobileMenuOpen(false);
+    }, [activeWriter, activeWhat, activeWhere, activeGallery, location.pathname]);
+
     const clearAll = () => {
         onWriterChange(null);
         onWhatChange(null);
@@ -192,21 +197,24 @@ const Sidebar = ({
                         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
-
-                {mobileMenuOpen && (
-                    <div className="mobile-menu-panel">
-                        {filterSectionEls}
-                        <Link
-                            to="/places"
-                            className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            <Camera size={18} />
-                            PLACES &amp; SPACES
-                        </Link>
-                    </div>
-                )}
             </header>
+
+            {/* Mobile Menu Panel — outside fixed header so it can scroll */}
+            {mobileMenuOpen && (
+                <div className="mobile-menu-panel">
+                    {filterSectionEls}
+                    <Link
+                        to="/places"
+                        className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <span className={`filter-section-icon-col${location.pathname === '/places' ? ' filter-section-icon-col--active' : ''}`}>
+                            <Camera size={18} />
+                        </span>
+                        <span className="places-link-label">PLACES &amp; SPACES</span>
+                    </Link>
+                </div>
+            )}
         </>
     );
 };
