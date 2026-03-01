@@ -70,11 +70,13 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
                 >
                     <X size={32} aria-hidden="true" />
                 </button>
-                <img
-                    src={photo.url}
-                    alt={alt}
-                    className="modal-zoom-photo"
-                />
+                <div className="modal-zoom-photo-wrapper">
+                    <img
+                        src={photo.url}
+                        alt={alt}
+                        className="modal-zoom-photo"
+                    />
+                </div>
             </div>
         );
     }

@@ -895,6 +895,20 @@ h1 {
   padding: 60px 20px 20px;
 }
 
+.modal-zoom-photo-wrapper {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+/* Transparent shield over zoomed image */
+.modal-zoom-photo-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .modal-zoom-photo {
   max-width: none;
   width: auto;
