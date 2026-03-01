@@ -301,6 +301,10 @@ h1 {
   background-color: rgba(0,0,0,0.06);
 }
 
+.filter-section-icon-col--clickable {
+  cursor: pointer;
+}
+
 .filter-section-icon-col--active {
   color: var(--theme-text);
   background-color: rgba(255,255,255,0.12);

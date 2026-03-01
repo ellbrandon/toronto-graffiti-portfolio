@@ -88,7 +88,10 @@ const FilterSection = ({ icon, title, options, value, onChange, placeholder, gal
     return (
         <div className="filter-section">
             <div className="filter-section-row">
-                <div className={`filter-section-icon-col${isActive ? ' filter-section-icon-col--active' : ''}`}>
+                <div
+                    className={`filter-section-icon-col filter-section-icon-col--clickable${isActive ? ' filter-section-icon-col--active' : ''}`}
+                    onClick={() => { onClearAll(); onShowGallery(galleryKey); }}
+                >
                     {icon}
                 </div>
                 <div className="filter-section-body">
