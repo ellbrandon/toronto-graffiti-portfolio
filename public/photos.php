@@ -39,6 +39,9 @@ const WHERE_TAGS = [
     'rooftop', 'subway', 'bando', 'urbex',
 ];
 
+// What tags to exclude entirely — photos with these tags are skipped
+const WHAT_EXCLUDED = ['nocturnal', 'nocturnals', 'stich', 'stiches', 'pano', 'panos'];
+
 // Build what lookup: accepts both singular and plural (lowercase) → plural display label
 $whatDisplay = [];
 foreach (WHAT_SINGULAR_TO_PLURAL as $singular => $plural) {
@@ -189,10 +192,15 @@ foreach ($files as $filepath) {
         $keywords = extractXmpKeywords(readXmp($filepath));
     }
 
-    // Parse keywords into writer/what/where
+    // Skip photos that contain an excluded what tag
+    $lowerKeywords = array_map(fn($k) => strtolower(trim($k)), $keywords);
+    if (array_intersect($lowerKeywords, WHAT_EXCLUDED)) continue;
+
+    // Parse keywords into writer/what/where/places
     $writers = [];
     $what    = null;
     $where   = null;
+    $places  = false;
 
     foreach ($keywords as $kw) {
         $kw    = trim($kw);
@@ -201,6 +209,8 @@ foreach ($files as $filepath) {
         if ($kw === '') continue;
         if (preg_match('/^\d{4}$/', $kw)) continue;   // skip year
         if ($lower === 'graffiti') continue;            // skip literal "graffiti"
+
+        if ($lower === 'placesandspaces') { $places = true; continue; }
 
         if (array_key_exists($lower, $whatDisplay)) {
             $what = $whatDisplay[$lower];
@@ -212,7 +222,7 @@ foreach ($files as $filepath) {
             continue;
         }
 
-        $writers[] = $kw;
+        $writers[] = ($lower === 'unknown') ? 'Unknown' : $kw;
     }
 
     $photos[] = [
@@ -222,6 +232,7 @@ foreach ($files as $filepath) {
         'writers'  => $writers,
         'what'     => $what,
         'where'    => $where,
+        'places'   => $places,
         'uploaded' => $uploaded,
     ];
 }

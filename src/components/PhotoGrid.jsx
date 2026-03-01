@@ -18,8 +18,10 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
                     onLoad={() => setLoaded(true)}
                 />
                 <div className="overlay">
-                    {photo.writers?.length > 0 && (
-                        <p className="overlay-title">{photo.writers.join(' · ')}</p>
+                    {(photo.writers?.length > 0 || photo.places) && (
+                        <p className="overlay-title">
+                            {photo.writers?.length > 0 ? photo.writers.join(' · ') : 'Places & Spaces'}
+                        </p>
                     )}
                 </div>
             </div>

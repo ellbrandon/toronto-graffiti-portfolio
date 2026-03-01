@@ -118,15 +118,16 @@ const Sidebar = ({
     whats, activeWhat, onWhatChange,
     wheres, activeWhere, onWhereChange,
     activeGallery, onShowGallery, onHomeClick,
+    placesActive, onShowPlaces,
     photoCount, lastUpdated,
 }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
 
-    // Close mobile menu whenever filters, gallery, or route changes
+    // Close mobile menu whenever filters, gallery, places, or route changes
     React.useEffect(() => {
         setMobileMenuOpen(false);
-    }, [activeWriter, activeWhat, activeWhere, activeGallery, location.pathname]);
+    }, [activeWriter, activeWhat, activeWhere, activeGallery, placesActive, location.pathname]);
 
     const clearAll = () => {
         onWriterChange(null);
@@ -156,6 +157,18 @@ const Sidebar = ({
         />
     ));
 
+    const placesBtn = (extraClass = '') => (
+        <button
+            className={`places-link${placesActive ? ' places-link--active' : ''}${extraClass}`}
+            onClick={onShowPlaces}
+        >
+            <span className={`filter-section-icon-col${placesActive ? ' filter-section-icon-col--active' : ''}`}>
+                <Camera size={18} />
+            </span>
+            <span className="places-link-label">PLACES &amp; SPACES</span>
+        </button>
+    );
+
     return (
         <>
             {/* Desktop Sidebar */}
@@ -163,15 +176,7 @@ const Sidebar = ({
                 <div className="desktop-sidebar-inner">
                     <div>
                         <nav>{filterSectionEls}</nav>
-                        <Link
-                            to="/places"
-                            className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
-                        >
-                            <span className={`filter-section-icon-col${location.pathname === '/places' ? ' filter-section-icon-col--active' : ''}`}>
-                                <Camera size={18} />
-                            </span>
-                            <span className="places-link-label">PLACES &amp; SPACES</span>
-                        </Link>
+                        {placesBtn()}
                     </div>
 
                     <div className="sidebar-options">
@@ -203,16 +208,7 @@ const Sidebar = ({
             {mobileMenuOpen && (
                 <div className="mobile-menu-panel">
                     {filterSectionEls}
-                    <Link
-                        to="/places"
-                        className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        <span className={`filter-section-icon-col${location.pathname === '/places' ? ' filter-section-icon-col--active' : ''}`}>
-                            <Camera size={18} />
-                        </span>
-                        <span className="places-link-label">PLACES &amp; SPACES</span>
-                    </Link>
+                    {placesBtn()}
                 </div>
             )}
         </>

@@ -4,7 +4,6 @@ import Sidebar from './components/Sidebar';
 import PhotoGrid from './components/PhotoGrid';
 import AllGallery from './components/AllGallery';
 import PhotoModal from './components/PhotoModal';
-import PlacesPage from './components/PlacesPage';
 import { fetchPhotos } from './data/photos';
 
 const SiteHeader = ({ onHomeClick }) => (
@@ -39,6 +38,7 @@ function AppContent() {
 
   const [activeFilters, setActiveFilters] = useState({ writer: null, what: null, where: null });
   const [activeGallery, setActiveGallery] = useState(null);
+  const [placesActive, setPlacesActive] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   // Fixed ordered lists — define display order in dropdowns and AllGallery
@@ -54,7 +54,11 @@ function AppContent() {
   ];
 
   // Unique filter values — writers are flattened from arrays
-  const writers = useMemo(() => [...new Set(basePhotos.flatMap(p => p.writers))].sort(), [basePhotos]);
+  const writers = useMemo(() => [...new Set(basePhotos.flatMap(p => p.writers))].sort((a, b) => {
+    if (a === 'Unknown') return 1;
+    if (b === 'Unknown') return -1;
+    return a.localeCompare(b);
+  }), [basePhotos]);
   const whats   = useMemo(() => {
     const present = new Set(basePhotos.map(p => p.what).filter(Boolean));
     return WHAT_ORDER.filter(w => present.has(w));
@@ -70,7 +74,7 @@ function AppContent() {
     return new Date(latest.uploaded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }, [basePhotos]);
 
-  // PhotoGrid: always newest-first
+  // Main grid: filtered + sorted; Places grid: places:true only
   const displayPhotos = useMemo(() => {
     const filtered = basePhotos.filter(photo => {
       if (activeFilters.writer && !photo.writers.includes(activeFilters.writer)) return false;
@@ -81,46 +85,60 @@ function AppContent() {
     return applySort(filtered);
   }, [basePhotos, activeFilters]);
 
+  const placesPhotos = useMemo(() => applySort(basePhotos.filter(p => p.places)), [basePhotos]);
+
   // AllGallery: writers alphabetical, what/where use fixed order
   const galleryConfig = useMemo(() => ({
-    writer: { field: 'writer', values: [...writers].sort((a, b) => a.localeCompare(b)) },
+    writer: { field: 'writer', values: [...writers].sort((a, b) => {
+      if (a === 'Unknown') return 1;
+      if (b === 'Unknown') return -1;
+      return a.localeCompare(b);
+    }) },
     what:   { field: 'what',   values: whats },
     where:  { field: 'where',  values: wheres },
   }), [writers, whats, wheres]);
 
-  // Scroll to top on any filter or gallery change
+  // Scroll to top on any filter, gallery, or places change
   useEffect(() => {
     const scroller = document.querySelector('.main-content') ?? window;
     scroller.scrollTo({ top: 0, behavior: 'instant' });
-  }, [activeFilters, activeGallery]);
+  }, [activeFilters, activeGallery, placesActive]);
 
   const clearAllFilters = () => setActiveFilters({ writer: null, what: null, where: null });
+
+  const goHome = () => { clearAllFilters(); setActiveGallery(null); setPlacesActive(false); navigate('/'); };
 
   const handleFilterChange = (type, value) => {
     setActiveFilters(prev => ({ ...prev, [type]: value === prev[type] ? null : value }));
   };
 
   const handleGallerySelect = (field, value) => { handleFilterChange(field, value); setActiveGallery(null); navigate('/'); };
-  const handleShowGallery   = (field) => { setActiveGallery(prev => prev === field ? null : field); navigate('/'); };
+  const handleShowGallery   = (field) => { setActiveGallery(prev => prev === field ? null : field); setPlacesActive(false); navigate('/'); };
+  const handleShowPlaces    = () => { setPlacesActive(prev => !prev); setActiveGallery(null); clearAllFilters(); navigate('/'); };
+
+  // Active photos for the modal (places or main grid)
+  const modalPhotos = placesActive ? placesPhotos : displayPhotos;
 
   return (
     <>
       <div className="app" data-theme={lightMode ? 'light' : 'dark'}>
-        <SiteHeader onHomeClick={() => { clearAllFilters(); setActiveGallery(null); navigate('/'); }} />
+        <SiteHeader onHomeClick={goHome} />
         <div className="app-body">
         <Sidebar
           writers={writers}
           activeWriter={activeFilters.writer}
-          onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); navigate('/'); }}
+          onWriterChange={(val) => { handleFilterChange('writer', val); setActiveGallery(null); setPlacesActive(false); navigate('/'); }}
           whats={whats}
           activeWhat={activeFilters.what}
-          onWhatChange={(val) => { handleFilterChange('what', val); setActiveGallery(null); navigate('/'); }}
+          onWhatChange={(val) => { handleFilterChange('what', val); setActiveGallery(null); setPlacesActive(false); navigate('/'); }}
           wheres={wheres}
           activeWhere={activeFilters.where}
-          onWhereChange={(val) => { handleFilterChange('where', val); setActiveGallery(null); navigate('/'); }}
+          onWhereChange={(val) => { handleFilterChange('where', val); setActiveGallery(null); setPlacesActive(false); navigate('/'); }}
           activeGallery={activeGallery}
           onShowGallery={handleShowGallery}
-          onHomeClick={() => { clearAllFilters(); setActiveGallery(null); navigate('/'); }}
+          onHomeClick={goHome}
+          placesActive={placesActive}
+          onShowPlaces={handleShowPlaces}
           photoCount={basePhotos.length}
           lastUpdated={lastUpdated}
         />
@@ -143,7 +161,14 @@ function AppContent() {
                 )}
 
                 {!loading && !loadError && (
-                  activeGallery ? (
+                  placesActive ? (
+                    <PhotoGrid
+                      photos={placesPhotos}
+                      onPhotoClick={setSelectedPhoto}
+                      colorMode={true}
+                      onClearFilters={goHome}
+                    />
+                  ) : activeGallery ? (
                     <AllGallery
                       allPhotos={basePhotos}
                       field={galleryConfig[activeGallery].field}
@@ -155,15 +180,10 @@ function AppContent() {
                       photos={displayPhotos}
                       onPhotoClick={setSelectedPhoto}
                       colorMode={true}
-                      onClearFilters={() => { clearAllFilters(); setActiveGallery(null); navigate('/'); }}
+                      onClearFilters={goHome}
                     />
                   )
                 )}
-              </div>
-            } />
-            <Route path="/places" element={
-              <div className="route-wrapper">
-                <PlacesPage />
               </div>
             } />
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -174,9 +194,9 @@ function AppContent() {
         <PhotoModal
           photo={selectedPhoto}
           onClose={() => setSelectedPhoto(null)}
-          photos={displayPhotos}
+          photos={modalPhotos}
           onNavigate={setSelectedPhoto}
-          onSelectFilter={(field, value) => { setActiveFilters({ writer: null, what: null, where: null, [field]: value }); setActiveGallery(null); }}
+          onSelectFilter={(field, value) => { setActiveFilters({ writer: null, what: null, where: null, [field]: value }); setActiveGallery(null); setPlacesActive(false); }}
         />
       </div>
     </>
