@@ -70,6 +70,12 @@ function AppContent() {
     where:  { field: 'where',  values: [...wheres].sort((a, b) => a.localeCompare(b)) },
   }), [writers, whats, wheres]);
 
+  // Scroll to top on any filter or gallery change
+  useEffect(() => {
+    const scroller = document.querySelector('.main-content') ?? window;
+    scroller.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeFilters, activeGallery]);
+
   const clearAllFilters = () => setActiveFilters({ writer: null, what: null, where: null });
 
   const handleFilterChange = (type, value) => {

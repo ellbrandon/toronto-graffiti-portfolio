@@ -155,28 +155,30 @@ const Sidebar = ({
         <>
             {/* Desktop Sidebar */}
             <aside className="desktop-sidebar">
-                <div>
-                    <nav>{filterSectionEls}</nav>
-                    <Link
-                        to="/places"
-                        className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
-                    >
-                        <span className={`filter-section-icon-col${location.pathname === '/places' ? ' filter-section-icon-col--active' : ''}`}>
-                            <Camera size={18} />
-                        </span>
-                        PLACES &amp; SPACES
-                    </Link>
-                </div>
-
-                <div className="sidebar-options">
-                    <div className="sidebar-stats">
-                        <p>{photoCount} Photos</p>
-                        <p>{writers.length} Writers</p>
-                        <p>Updated: {lastUpdated}</p>
+                <div className="desktop-sidebar-inner">
+                    <div>
+                        <nav>{filterSectionEls}</nav>
+                        <Link
+                            to="/places"
+                            className={`places-link${location.pathname === '/places' ? ' places-link--active' : ''}`}
+                        >
+                            <span className={`filter-section-icon-col${location.pathname === '/places' ? ' filter-section-icon-col--active' : ''}`}>
+                                <Camera size={18} />
+                            </span>
+                            <span className="places-link-label">PLACES &amp; SPACES</span>
+                        </Link>
                     </div>
-                    <p className="sidebar-copyright">
-                        &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
-                    </p>
+
+                    <div className="sidebar-options">
+                        <div className="sidebar-stats">
+                            <p>{photoCount} Photos</p>
+                            <p>{writers.length} Writers</p>
+                            <p>Updated: {lastUpdated}</p>
+                        </div>
+                        <p className="sidebar-copyright">
+                            &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
+                        </p>
+                    </div>
                 </div>
             </aside>
 

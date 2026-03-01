@@ -127,15 +127,15 @@ h1 {
   display: flex;
   flex: 1;
   min-height: 0;
-}
-
-.desktop-sidebar {
-  flex-shrink: 0;
+  /* Reserve space for the collapsed sidebar only — no layout shift on expand */
+  padding-left: 72px;
+  position: relative;
 }
 
 .main-content {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   overflow-y: auto;
   background-color: var(--theme-bg);
   transition: background-color 0.3s;
@@ -221,16 +221,36 @@ h1 {
    SIDEBAR — Desktop
    ============================================================ */
 .desktop-sidebar {
-  width: 290px;
-  flex-shrink: 0;
-  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 72px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--theme-bg);
-  overflow-y: auto;
-  transition: background-color 0.3s;
+  overflow: hidden;
+  transition: width 0.25s ease, background-color 0.3s, box-shadow 0.25s ease;
   border-right: 1px solid var(--theme-border-faint);
+  z-index: 50;
+}
+
+.desktop-sidebar:hover {
+  width: 240px;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+}
+
+/* Inner scroll container so the sidebar content can scroll without the sidebar itself scrolling */
+.desktop-sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  width: 240px; /* fixed width so content doesn't reflow during animate */
 }
 
 .site-title-link {
@@ -255,7 +275,7 @@ h1 {
 }
 
 .filter-section {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .filter-section-row {
@@ -293,6 +313,15 @@ h1 {
 .filter-section-body {
   flex: 1;
   min-width: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  /* prevent text wrapping during transition */
+  white-space: nowrap;
+}
+
+.desktop-sidebar:hover .filter-section-body {
+  opacity: 1;
+  transition: opacity 0.2s ease 0.1s; /* slight delay so it fades in after width opens */
 }
 
 .filter-section-title {
@@ -321,13 +350,14 @@ h1 {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 30px;
+  margin-top: 24px;
   font-size: 0.9rem;
   font-weight: 300;
   letter-spacing: 0.1em;
   color: var(--grey);
   text-transform: uppercase;
   transition: color 0.2s;
+  white-space: nowrap;
 }
 
 .places-link:hover,
@@ -335,8 +365,26 @@ h1 {
   color: var(--theme-text);
 }
 
+/* Text label beside the camera icon — hidden when collapsed */
+.places-link-label {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.desktop-sidebar:hover .places-link-label {
+  opacity: 1;
+  transition: opacity 0.2s ease 0.1s;
+}
+
 .sidebar-options {
   margin-top: 40px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.desktop-sidebar:hover .sidebar-options {
+  opacity: 1;
+  transition: opacity 0.2s ease 0.1s;
 }
 
 .sidebar-stats {
@@ -501,7 +549,7 @@ h1 {
    PHOTO GRID
    ============================================================ */
 .photo-grid-wrapper {
-  padding: 0 40px 100px 0;
+  padding: 0 0 100px 0;
 }
 
 .photo-grid-empty {
@@ -820,12 +868,10 @@ h1 {
   .main-content { padding-top: 0; }
   .site-header { padding: 16px 20px 12px; }
   .site-header .site-title { font-size: 1.4rem; }
-  .app-body { flex-direction: column; }
+  .app-body { flex-direction: column; padding-left: 0; }
   .layout-masonry .grid-sizer,
   .layout-masonry .grid-item { width: calc(50% - 10px); }
   .allgallery-grid { grid-template-columns: repeat(2, 1fr); }
-  .photo-grid-wrapper,
-  .allgallery-wrapper { padding-left: 40px; }
 }
 
 @media (min-width: 769px) {
