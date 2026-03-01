@@ -205,6 +205,7 @@ function AppContent() {
               <div className="route-wrapper">
                 {loading && (
                   <div className="photo-grid-empty" role="status" aria-live="polite">
+                    <span className="loading-spinner" aria-hidden="true" />
                     <p className="photo-grid-empty-title">Loading photos…</p>
                   </div>
                 )}
