@@ -298,8 +298,8 @@ h1 {
 
 .filter-section-row {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
 }
 
 .filter-section-icon-col {

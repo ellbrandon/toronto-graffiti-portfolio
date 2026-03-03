@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Frown } from 'lucide-react';
 import { useLayout } from '../hooks/useLayout';
 
-const INITIAL_COUNT = 48; // multiple of 3 columns
+const INITIAL_COUNT = 24; // multiple of 3 columns
 const INCREMENT     = 30;
 
 const photoAlt = (photo) => {
