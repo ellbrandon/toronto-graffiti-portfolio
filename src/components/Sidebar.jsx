@@ -212,7 +212,7 @@ const Sidebar = ({
             <header className="mobile-header">
                 <div className="mobile-header-row">
                     <Link to="/" className="site-title-mobile" onClick={onHomeClick}>
-                        <h1>TORONTO GRAFFITI</h1>
+                        <h1>TORONTO GRAFF</h1>
                     </Link>
                     <button
                         className="btn-icon"
@@ -231,9 +231,16 @@ const Sidebar = ({
                 <nav id="mobile-menu-panel" className="mobile-menu-panel" aria-label="Photo filters">
                     {filterSectionEls}
                     {placesBtn()}
-                    <Link to="/copyright" className="mobile-copyright" onClick={() => setMobileMenuOpen(false)}>
-                        &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
-                    </Link>
+                    <div className="mobile-bottom">
+                        <div className="sidebar-stats" aria-label="Archive statistics">
+                            <p>{photoCount} Photos</p>
+                            <p>{writers.length} Writers</p>
+                            <p>Updated: {lastUpdated}</p>
+                        </div>
+                        <Link to="/copyright" className="mobile-copyright" onClick={() => setMobileMenuOpen(false)}>
+                            &copy; {new Date().getFullYear()} ALL RIGHTS RESERVED
+                        </Link>
+                    </div>
                 </nav>
             )}
         </>

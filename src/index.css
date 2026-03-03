@@ -707,7 +707,7 @@ h1 {
 
 /* Layout mode containers */
 /* Items are invisible until masonry fires layoutComplete, preventing CLS */
-.layout-masonry { /* Masonry positions items via JS */ }
+/* .layout-masonry — Masonry positions items via JS, no styles needed here */
 .layout-masonry .grid-item      { opacity: 0; transition: opacity 0.3s ease; }
 .layout-masonry.masonry-ready .grid-item { opacity: 1; }
 
@@ -1049,10 +1049,15 @@ h1 {
   color: var(--theme-text);
 }
 
-.mobile-copyright {
-  display: block;
+.mobile-bottom {
   margin-top: auto;
   padding-top: 32px;
+}
+
+.mobile-copyright {
+  display: block;
+  margin-top: 12px;
+  padding-top: 12px;
   font-size: 0.7rem;
   color: var(--theme-text-muted);
   letter-spacing: 0.1em;
