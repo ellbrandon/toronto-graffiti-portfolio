@@ -62,20 +62,40 @@ function AppContent() {
     'Rooftop', 'Subway', 'Bando', 'Urbex',
   ];
 
-  // Unique filter values — writers are flattened from arrays
-  const writers = useMemo(() => [...new Set(basePhotos.flatMap(p => p.writers))].sort((a, b) => {
-    if (a === 'Unknown') return 1;
-    if (b === 'Unknown') return -1;
-    return a.localeCompare(b);
-  }), [basePhotos]);
-  const whats   = useMemo(() => {
-    const present = new Set(basePhotos.map(p => p.what).filter(Boolean));
+  // Interdependent filter options — each dropdown shows only values present
+  // in photos that satisfy the OTHER two active filters.
+  const writers = useMemo(() => {
+    const pool = basePhotos.filter(p => {
+      if (activeFilters.what  && p.what  !== activeFilters.what)  return false;
+      if (activeFilters.where && p.where !== activeFilters.where) return false;
+      return true;
+    });
+    return [...new Set(pool.flatMap(p => p.writers))].sort((a, b) => {
+      if (a === 'Unknown') return 1;
+      if (b === 'Unknown') return -1;
+      return a.localeCompare(b);
+    });
+  }, [basePhotos, activeFilters.what, activeFilters.where]);
+
+  const whats = useMemo(() => {
+    const pool = basePhotos.filter(p => {
+      if (activeFilters.writer && !p.writers.includes(activeFilters.writer)) return false;
+      if (activeFilters.where  && p.where !== activeFilters.where)           return false;
+      return true;
+    });
+    const present = new Set(pool.map(p => p.what).filter(Boolean));
     return WHAT_ORDER.filter(w => present.has(w));
-  }, [basePhotos]);
-  const wheres  = useMemo(() => {
-    const present = new Set(basePhotos.map(p => p.where).filter(Boolean));
+  }, [basePhotos, activeFilters.writer, activeFilters.where]);
+
+  const wheres = useMemo(() => {
+    const pool = basePhotos.filter(p => {
+      if (activeFilters.writer && !p.writers.includes(activeFilters.writer)) return false;
+      if (activeFilters.what   && p.what  !== activeFilters.what)            return false;
+      return true;
+    });
+    const present = new Set(pool.map(p => p.where).filter(Boolean));
     return WHERE_ORDER.filter(w => present.has(w));
-  }, [basePhotos]);
+  }, [basePhotos, activeFilters.writer, activeFilters.what]);
 
   const lastUpdated = useMemo(() => {
     if (!basePhotos.length) return '';
