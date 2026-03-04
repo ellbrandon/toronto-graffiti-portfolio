@@ -200,19 +200,11 @@ foreach ($files as $filepath) {
     // Relative path from the photos dir, e.g. "2025/DSC_0082.jpg"
     $relativePath = ltrim(str_replace($photosDir, '', $filepath), '/\\');
 
-    // Use Exif DateTimeOriginal (when photo was taken) — fall back to file mtime
-    $uploaded = null;
+    // Sort by file modification time (when the file was added/changed on disk)
+    $uploaded  = date('c', filemtime($filepath));
     $imgWidth  = null;
     $imgHeight = null;
     $exif = @exif_read_data($filepath);
-    if (!empty($exif['DateTimeOriginal'])) {
-        // Exif format: "2025:10:11 19:29:00"
-        $dt = DateTime::createFromFormat('Y:m:d H:i:s', $exif['DateTimeOriginal']);
-        if ($dt) $uploaded = $dt->format('c');
-    }
-    if (!$uploaded) {
-        $uploaded = date('c', filemtime($filepath));
-    }
     // Image dimensions for orientation detection on the client.
     // getimagesize() is the most reliable source of actual pixel dimensions.
     $sz = @getimagesize($filepath);

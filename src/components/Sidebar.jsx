@@ -11,13 +11,18 @@ const IconInput = ({ iconLeft, iconRight, onClick, children }) => (
     </div>
 );
 
-const SearchableSelect = ({ options, value, onChange, placeholder }) => {
+const SearchableSelect = ({ options, value, onChange, placeholder, secretOptions = [] }) => {
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
     const containerRef = React.useRef(null);
     const listId = React.useId();
 
-    const filtered = options.filter(o => o.toLowerCase().includes(query.toLowerCase()));
+    // Reveal secret options only when the query is an exact full-text match (case-insensitive)
+    const visibleSecrets = secretOptions.filter(o => query.toLowerCase() === o.toLowerCase());
+    const filtered = [
+        ...options.filter(o => o.toLowerCase().includes(query.toLowerCase())),
+        ...visibleSecrets,
+    ];
 
     React.useEffect(() => {
         const handler = (e) => {
@@ -93,7 +98,7 @@ const SearchableSelect = ({ options, value, onChange, placeholder }) => {
     );
 };
 
-const FilterSection = ({ icon, title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll }) => {
+const FilterSection = ({ icon, title, options, value, onChange, placeholder, galleryKey, activeGallery, onShowGallery, onClearAll, secretOptions }) => {
     const isGalleryOpen = activeGallery === galleryKey;
     const isActive = isGalleryOpen || !!value;
     const galleryLabel = `Browse all ${title} gallery`;
@@ -127,6 +132,7 @@ const FilterSection = ({ icon, title, options, value, onChange, placeholder, gal
                             value={value}
                             onChange={onChange}
                             placeholder={placeholder}
+                            secretOptions={secretOptions}
                         />
                     </div>
                 </div>
@@ -136,7 +142,7 @@ const FilterSection = ({ icon, title, options, value, onChange, placeholder, gal
 };
 
 const Sidebar = ({
-    writers, activeWriter, onWriterChange,
+    writers, secretWriters = [], activeWriter, onWriterChange,
     whats, activeWhat, onWhatChange,
     wheres, activeWhere, onWhereChange,
     activeGallery, onClearAndShowGallery, onHomeClick,
@@ -151,9 +157,9 @@ const Sidebar = ({
     }, [activeWriter, activeWhat, activeWhere, activeGallery, placesActive]);
 
     const filterSections = [
-        { icon: <UserRoundPlus size={18} />, title: 'Writers', options: writers, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
-        { icon: <SprayCan      size={18} />, title: 'What',    options: whats,   value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
-        { icon: <Locate        size={18} />, title: 'Where',   options: wheres,  value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
+        { icon: <UserRoundPlus size={18} />, title: 'Writers', options: writers, secretOptions: secretWriters, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
+        { icon: <SprayCan      size={18} />, title: 'What',    options: whats,                                 value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
+        { icon: <Locate        size={18} />, title: 'Where',   options: wheres,                                value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
     ];
 
     const filterSectionEls = filterSections.map(s => (
@@ -162,6 +168,7 @@ const Sidebar = ({
             icon={s.icon}
             title={s.title}
             options={s.options}
+            secretOptions={s.secretOptions}
             value={s.value}
             onChange={s.onChange}
             placeholder={s.placeholder}

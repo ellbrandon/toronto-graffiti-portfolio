@@ -129,18 +129,12 @@ foreach ($files as $filepath) {
     $filename     = basename($filepath);
     $relativePath = ltrim(str_replace($photosDir, '', $filepath), '/\\');
 
-    $uploaded  = null;
+    // Sort by file modification time (when the file was added/changed on disk)
+    $uploaded  = date('c', filemtime($filepath));
     $imgWidth  = null;
     $imgHeight = null;
 
     $exif = @exif_read_data($filepath);
-    if (!empty($exif['DateTimeOriginal'])) {
-        $dt = DateTime::createFromFormat('Y:m:d H:i:s', $exif['DateTimeOriginal']);
-        if ($dt) $uploaded = $dt->format('c');
-    }
-    if (!$uploaded) {
-        $uploaded = date('c', filemtime($filepath));
-    }
 
     $sz = @getimagesize($filepath);
     if ($sz) {

@@ -116,16 +116,24 @@ function AppContent() {
 
   const placesPhotos = useMemo(() => applySort(basePhotos.filter(p => p.places)), [basePhotos]);
 
+  // Writers hidden from all public-facing lists (dropdown + AllGallery)
+  const SECRET_WRITERS = new Set(['Beef']);
+
+  const publicWriters = useMemo(
+    () => writers.filter(w => !SECRET_WRITERS.has(w)),
+    [writers],
+  );
+
   // AllGallery: writers alphabetical, what/where use fixed order
   const galleryConfig = useMemo(() => ({
-    writer: { field: 'writer', values: [...writers].sort((a, b) => {
+    writer: { field: 'writer', values: [...publicWriters].sort((a, b) => {
       if (a === 'Unknown') return 1;
       if (b === 'Unknown') return -1;
       return a.localeCompare(b);
     }) },
     what:   { field: 'what',   values: whats },
     where:  { field: 'where',  values: wheres },
-  }), [writers, whats, wheres]);
+  }), [publicWriters, whats, wheres]);
 
   // Scroll to top on any filter, gallery, or places change
   useEffect(() => {
@@ -200,7 +208,8 @@ function AppContent() {
         <SiteHeader onHomeClick={goHome} />
         <div className="app-body">
         <Sidebar
-          writers={writers}
+          writers={publicWriters}
+          secretWriters={[...SECRET_WRITERS].filter(w => writers.includes(w))}
           activeWriter={activeFilters.writer}
           onWriterChange={(val) => handleFilterChange('writer', val, { closeView: true })}
           whats={whats}
