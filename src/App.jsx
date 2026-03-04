@@ -54,7 +54,7 @@ function AppContent() {
   const WHAT_ORDER  = [
     'Handstyles', 'Hollows', 'Throws', 'Pieces', 'Rollers',
     'Extinguishers', 'Rappels', 'Characters', 'Details', 'Wall Wisdoms',
-    'Slaps', 'Cans',
+    'Slaps', 'Cans', 'Beef',
   ];
   const WHERE_ORDER = [
     'Alley', 'Bridge', 'Tunnel', 'Trackside', 'Freight',
@@ -116,12 +116,22 @@ function AppContent() {
 
   const placesPhotos = useMemo(() => applySort(basePhotos.filter(p => p.places)), [basePhotos]);
 
-  // Writers hidden from all public-facing lists (dropdown + AllGallery)
-  const SECRET_WRITERS = new Set(['Beef']);
+  // Values hidden from all public-facing lists (dropdown + AllGallery)
+  const SECRET_WRITERS = new Set([]);
+  const SECRET_WHATS   = new Set(['Beef']);
+  const SECRET_WHERES  = new Set([]);
 
   const publicWriters = useMemo(
     () => writers.filter(w => !SECRET_WRITERS.has(w)),
     [writers],
+  );
+  const publicWhats = useMemo(
+    () => whats.filter(w => !SECRET_WHATS.has(w)),
+    [whats],
+  );
+  const publicWheres = useMemo(
+    () => wheres.filter(w => !SECRET_WHERES.has(w)),
+    [wheres],
   );
 
   // AllGallery: writers alphabetical, what/where use fixed order
@@ -131,9 +141,9 @@ function AppContent() {
       if (b === 'Unknown') return -1;
       return a.localeCompare(b);
     }) },
-    what:   { field: 'what',   values: whats },
-    where:  { field: 'where',  values: wheres },
-  }), [publicWriters, whats, wheres]);
+    what:   { field: 'what',   values: publicWhats },
+    where:  { field: 'where',  values: publicWheres },
+  }), [publicWriters, publicWhats, publicWheres]);
 
   // Scroll to top on any filter, gallery, or places change
   useEffect(() => {
@@ -212,10 +222,12 @@ function AppContent() {
           secretWriters={[...SECRET_WRITERS].filter(w => writers.includes(w))}
           activeWriter={activeFilters.writer}
           onWriterChange={(val) => handleFilterChange('writer', val, { closeView: true })}
-          whats={whats}
+          whats={publicWhats}
+          secretWhats={[...SECRET_WHATS].filter(w => whats.includes(w))}
           activeWhat={activeFilters.what}
           onWhatChange={(val) => handleFilterChange('what', val, { closeView: true })}
-          wheres={wheres}
+          wheres={publicWheres}
+          secretWheres={[...SECRET_WHERES].filter(w => wheres.includes(w))}
           activeWhere={activeFilters.where}
           onWhereChange={(val) => handleFilterChange('where', val, { closeView: true })}
           activeGallery={activeGallery}

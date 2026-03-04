@@ -143,8 +143,8 @@ const FilterSection = ({ icon, title, options, value, onChange, placeholder, gal
 
 const Sidebar = ({
     writers, secretWriters = [], activeWriter, onWriterChange,
-    whats, activeWhat, onWhatChange,
-    wheres, activeWhere, onWhereChange,
+    whats, secretWhats = [], activeWhat, onWhatChange,
+    wheres, secretWheres = [], activeWhere, onWhereChange,
     activeGallery, onClearAndShowGallery, onHomeClick,
     placesActive, onShowPlaces,
     photoCount, lastUpdated,
@@ -158,8 +158,8 @@ const Sidebar = ({
 
     const filterSections = [
         { icon: <UserRoundPlus size={18} />, title: 'Writers', options: writers, secretOptions: secretWriters, value: activeWriter, onChange: onWriterChange, placeholder: 'Search writers...', galleryKey: 'writer' },
-        { icon: <SprayCan      size={18} />, title: 'What',    options: whats,                                 value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
-        { icon: <Locate        size={18} />, title: 'Where',   options: wheres,                                value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
+        { icon: <SprayCan      size={18} />, title: 'What',    options: whats,   secretOptions: secretWhats, value: activeWhat,   onChange: onWhatChange,   placeholder: 'Search what...',    galleryKey: 'what' },
+        { icon: <Locate        size={18} />, title: 'Where',   options: wheres,  secretOptions: secretWheres, value: activeWhere,  onChange: onWhereChange,  placeholder: 'Search where...',   galleryKey: 'where' },
     ];
 
     const filterSectionEls = filterSections.map(s => (
