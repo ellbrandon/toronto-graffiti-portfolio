@@ -53,8 +53,8 @@ function AppContent() {
   // Fixed ordered lists — define display order in dropdowns and AllGallery
   const WHAT_ORDER  = [
     'Handstyles', 'Hollows', 'Throws', 'Pieces', 'Rollers',
-    'Extinguishers', 'Rappels', 'Characters', 'Details', 'Wall Wisdoms',
-    'Slaps', 'Cans', 'Beef',
+    'Extinguishers', 'Rappels', 'Characters', 'Details',
+    'Slaps', 'Cans', 'Wall Wisdoms', 'Beefs',
   ];
   const WHERE_ORDER = [
     'Alley', 'Bridge', 'Tunnel', 'Trackside', 'Freight',
@@ -103,9 +103,18 @@ function AppContent() {
     return new Date(latest.uploaded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }, [basePhotos]);
 
+  // Values hidden from all public-facing lists (dropdown + AllGallery)
+  const SECRET_WRITERS = new Set([]);
+  const SECRET_WHATS   = new Set(['Beefs']);
+  const SECRET_WHERES  = new Set([]);
+
   // Main grid: filtered + sorted; Places grid: places:true only
   const displayPhotos = useMemo(() => {
     const filtered = basePhotos.filter(photo => {
+      // Hide secret values unless explicitly selected
+      if (SECRET_WHATS.has(photo.what)  && activeFilters.what   !== photo.what)  return false;
+      if (SECRET_WHERES.has(photo.where) && activeFilters.where !== photo.where) return false;
+      if (photo.writers.some(w => SECRET_WRITERS.has(w)) && !photo.writers.includes(activeFilters.writer)) return false;
       if (activeFilters.writer && !photo.writers.includes(activeFilters.writer)) return false;
       if (activeFilters.what   && photo.what  !== activeFilters.what)            return false;
       if (activeFilters.where  && photo.where !== activeFilters.where)           return false;
@@ -115,11 +124,6 @@ function AppContent() {
   }, [basePhotos, activeFilters]);
 
   const placesPhotos = useMemo(() => applySort(basePhotos.filter(p => p.places)), [basePhotos]);
-
-  // Values hidden from all public-facing lists (dropdown + AllGallery)
-  const SECRET_WRITERS = new Set([]);
-  const SECRET_WHATS   = new Set(['Beef']);
-  const SECRET_WHERES  = new Set([]);
 
   const publicWriters = useMemo(
     () => writers.filter(w => !SECRET_WRITERS.has(w)),

@@ -46,9 +46,10 @@ const WHAT_SINGULAR_TO_PLURAL = [
     'rappel'       => 'Rappels',
     'character'    => 'Characters',
     'detail'       => 'Details',
-    'wall wisdom'  => 'Wall Wisdoms',
     'slap'         => 'Slaps',
     'can'          => 'Cans',
+    'beef'         => 'Beefs',
+    'wallwisdom'   => 'Wall Wisdoms',
 ];
 
 const WHERE_TAGS = [
@@ -163,7 +164,8 @@ foreach ($files as $filepath) {
     if (array_intersect($lowerKeywords, WHAT_EXCLUDED)) continue;
 
     $writers = [];
-    $what    = null;
+    // beef always wins as the what tag — set it upfront so other what-tags can't overwrite it
+    $what    = in_array('beef', $lowerKeywords) ? 'Beefs' : null;
     $where   = null;
     $places  = false;
 
@@ -173,8 +175,9 @@ foreach ($files as $filepath) {
         if ($kw === '') continue;
         if (preg_match('/^\d{4}$/', $kw)) continue;
         if ($lower === 'graffiti' || $lower === 'graff') continue;
+        if ($lower === 'beef') continue; // already handled above
         if ($lower === 'placesandspaces') { $places = true; continue; }
-        if (array_key_exists($lower, $whatDisplay)) { $what = $whatDisplay[$lower]; continue; }
+        if (array_key_exists($lower, $whatDisplay)) { if ($what === null) $what = $whatDisplay[$lower]; continue; }
         if (array_key_exists($lower, $whereDisplay)) { $where = $whereDisplay[$lower]; continue; }
         $writers[] = ($lower === 'unknown') ? 'Unknown' : ucwords($lower);
     }
@@ -183,7 +186,7 @@ foreach ($files as $filepath) {
         'id'       => $id++,
         'filename' => $filename,
         'url'      => $baseUrl . str_replace('\\', '/', $relativePath),
-        'writers'  => $writers,
+        'writers'  => $writers ?: ['Unknown'],
         'what'     => $what,
         'where'    => $where,
         'places'   => $places,
@@ -211,5 +214,5 @@ echo json_encode([
     'ok'      => true,
     'photos'  => count($photos),
     'cached'  => $cacheFile,
-    'generated' => date('c'),
+    'generated'  => date('c'),
 ]);

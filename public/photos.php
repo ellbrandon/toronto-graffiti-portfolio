@@ -35,9 +35,10 @@ const WHAT_SINGULAR_TO_PLURAL = [
     'rappel'       => 'Rappels',
     'character'    => 'Characters',
     'detail'       => 'Details',
-    'wall wisdom'  => 'Wall Wisdoms',
     'slap'         => 'Slaps',
     'can'          => 'Cans',
+    'beef'         => 'Beefs',
+    'wallwisdom'   => 'Wall Wisdoms',
 ];
 
 const WHERE_TAGS = [
@@ -241,7 +242,8 @@ foreach ($files as $filepath) {
 
     // Parse keywords into writer/what/where/places
     $writers = [];
-    $what    = null;
+    // beef always wins as the what tag — set it upfront so other what-tags can't overwrite it
+    $what    = in_array('beef', $lowerKeywords) ? 'Beefs' : null;
     $where   = null;
     $places  = false;
 
@@ -252,11 +254,12 @@ foreach ($files as $filepath) {
         if ($kw === '') continue;
         if (preg_match('/^\d{4}$/', $kw)) continue;   // skip year
         if ($lower === 'graffiti' || $lower === 'graff') continue; // skip generic graffiti tags
+        if ($lower === 'beef') continue; // already handled above
 
         if ($lower === 'placesandspaces') { $places = true; continue; }
 
         if (array_key_exists($lower, $whatDisplay)) {
-            $what = $whatDisplay[$lower];
+            if ($what === null) $what = $whatDisplay[$lower]; // beef already set? skip
             continue;
         }
 
@@ -272,7 +275,7 @@ foreach ($files as $filepath) {
         'id'       => $id++,
         'filename' => $filename,
         'url'      => $baseUrl . str_replace('\\', '/', $relativePath),
-        'writers'  => $writers,
+        'writers'  => $writers ?: ['Unknown'],
         'what'     => $what,
         'where'    => $where,
         'places'   => $places,
