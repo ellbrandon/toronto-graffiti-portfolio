@@ -302,6 +302,11 @@ h1 {
   gap: 16px;
 }
 
+.filter-section-controls-row {
+  padding-left: 48px; /* 32px icon + 16px gap */
+  margin-top: 6px;
+}
+
 .filter-section-icon-col {
   display: flex;
   align-items: center;
@@ -324,6 +329,10 @@ h1 {
 
 .filter-section-icon-col--clickable {
   cursor: pointer;
+}
+
+.filter-section-icon-col--clickable:hover {
+  color: var(--theme-text);
 }
 
 .filter-section-icon-col--active {
@@ -354,7 +363,6 @@ h1 {
   color: var(--grey);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 10px;
   font-weight: 300;
   transition: color 0.2s;
 }

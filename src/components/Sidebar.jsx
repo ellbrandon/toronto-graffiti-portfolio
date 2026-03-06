@@ -125,16 +125,18 @@ const FilterSection = ({ icon, title, options, value, onChange, placeholder, gal
                     >
                         {title}
                     </h3>
-                    <div className="filter-section-controls">
-                        <SearchableSelect
-                            key={value ?? '__empty__'}
-                            options={options}
-                            value={value}
-                            onChange={onChange}
-                            placeholder={placeholder}
-                            secretOptions={secretOptions}
-                        />
-                    </div>
+                </div>
+            </div>
+            <div className="filter-section-body filter-section-controls-row">
+                <div className="filter-section-controls">
+                    <SearchableSelect
+                        key={value ?? '__empty__'}
+                        options={options}
+                        value={value}
+                        onChange={onChange}
+                        placeholder={placeholder}
+                        secretOptions={secretOptions}
+                    />
                 </div>
             </div>
         </div>
