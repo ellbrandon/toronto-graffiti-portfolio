@@ -1,7 +1,10 @@
 Options -MultiViews
 RewriteEngine On
+
+# ── Coming soon gate ─────────────────────────────────────────
+# Route all non-file requests through gate.php (handles cookie check + coming soon)
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^ index.html [QSA,L]
+RewriteRule ^ gate.php [QSA,L]
 
 # ── Compression ──────────────────────────────────────────────
 <IfModule mod_deflate.c>
