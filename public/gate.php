@@ -31,7 +31,19 @@ header('Content-Type: text/html; charset=utf-8');
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TorontoGraff.com</title>
+  <title>Toronto Graffiti Archive | TorontoGraff.com</title>
+  <meta name="description" content="The most comprehensive archive of Toronto graffiti photography. Coming soon." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://torontograff.com/" />
+  <meta property="og:title" content="Toronto Graffiti Archive | TorontoGraff.com" />
+  <meta property="og:description" content="The most comprehensive archive of Toronto graffiti photography. Coming soon." />
+  <meta property="og:image" content="https://torontograff.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Toronto Graffiti Archive | TorontoGraff.com" />
+  <meta name="twitter:description" content="The most comprehensive archive of Toronto graffiti photography. Coming soon." />
+  <meta name="twitter:image" content="https://torontograff.com/og-image.jpg" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
