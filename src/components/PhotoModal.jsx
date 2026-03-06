@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const photoAlt = (photo) => {
@@ -10,10 +11,13 @@ const photoAlt = (photo) => {
     return parts.length ? parts.join(' · ') : 'Graffiti photo';
 };
 
+const isTouch = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
 const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter }) => {
     const [zoomed, setZoomed] = useState(false);
     const zoomedRef = useRef(false);
     const closeRef = useRef(null);
+    const zoomOverlayRef = useRef(null);
 
     // Keep ref in sync with state
     useEffect(() => { zoomedRef.current = zoomed; }, [zoomed]);
@@ -54,9 +58,45 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
     const alt = photoAlt(photo);
 
     if (zoomed) {
+        // Touch devices: native pinch-zoom fullscreen, close button via portal
+        if (isTouch()) {
+            return (
+                <>
+                    <div
+                        className="modal-zoom-overlay modal-zoom-overlay--touch"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Zoomed photo"
+                        onClick={() => setZoomed(false)}
+                    >
+                        <div className="modal-zoom-photo-wrapper">
+                            <img
+                                src={photo.url}
+                                alt={alt}
+                                className="modal-zoom-photo"
+                            />
+                        </div>
+                    </div>
+                    {createPortal(
+                        <button
+                            className="modal-close-btn modal-zoom-close-btn"
+                            onClick={() => setZoomed(false)}
+                            aria-label="Close zoomed view"
+                            ref={closeRef}
+                        >
+                            <X size={32} aria-hidden="true" />
+                        </button>,
+                        document.body
+                    )}
+                </>
+            );
+        }
+
+        // Desktop: full-resolution scrollable zoom
         return (
             <div
-                className="modal-zoom-overlay"
+                ref={zoomOverlayRef}
+                className="modal-zoom-overlay modal-zoom-overlay--desktop"
                 role="dialog"
                 aria-modal="true"
                 aria-label="Zoomed photo"
@@ -75,6 +115,10 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
                         src={photo.url}
                         alt={alt}
                         className="modal-zoom-photo"
+                        onLoad={() => {
+                            const el = zoomOverlayRef.current;
+                            if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+                        }}
                     />
                 </div>
             </div>
