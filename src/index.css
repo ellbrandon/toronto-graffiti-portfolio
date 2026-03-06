@@ -904,7 +904,7 @@ h1 {
   align-items: center;
   justify-content: center;
   /* Allow native pinch-zoom on the overlay itself */
-  touch-action: pinch-zoom;
+  touch-action: pan-x pan-y pinch-zoom;
   cursor: zoom-out;
 }
 
@@ -926,7 +926,7 @@ h1 {
   display: block;
   object-fit: contain;
   /* Let the image itself receive pinch gestures */
-  touch-action: pinch-zoom;
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 .modal-tags {
