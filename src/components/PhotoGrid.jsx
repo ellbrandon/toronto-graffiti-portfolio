@@ -14,7 +14,7 @@ const photoAlt = (photo) => {
     return parts.length ? parts.join(' · ') : 'Graffiti photo';
 };
 
-const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
+const PhotoCard = ({ photo, onPhotoClick, colorMode, priority }) => {
     const [loaded, setLoaded] = useState(false);
     const isPortrait = photo.width && photo.height && photo.height > photo.width;
     return (
@@ -31,7 +31,9 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode }) => {
                     src={photo.url}
                     alt={photoAlt(photo)}
                     className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}${loaded ? ' photo-img--loaded' : ''}`}
-                    decoding="async"
+                    loading={priority ? 'eager' : 'lazy'}
+                    fetchpriority={priority ? 'high' : 'low'}
+                    decoding={priority ? 'sync' : 'async'}
                     onLoad={() => setLoaded(true)}
                 />
                 <div className="overlay" aria-hidden="true">
@@ -117,12 +119,13 @@ const PhotoGrid = ({ photos, onPhotoClick, colorMode, onClearFilters }) => {
             <div className="photo-grid-wrapper" style={photos.length === 0 ? { display: 'none' } : undefined}>
                 <div ref={gridRef} className="layout-masonry">
                     <div className="grid-sizer" />
-                    {visiblePhotos.map((photo) => (
+                    {visiblePhotos.map((photo, i) => (
                         <PhotoCard
                             key={photo.id}
                             photo={photo}
                             onPhotoClick={onPhotoClick}
                             colorMode={colorMode}
+                            priority={i < 6}
                         />
                     ))}
                 </div>
