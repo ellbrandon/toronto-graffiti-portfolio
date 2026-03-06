@@ -32,7 +32,7 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode, priority }) => {
                     alt={photoAlt(photo)}
                     className={`photo-img ${colorMode ? 'color-mode' : 'grayscale-mode'}${loaded ? ' photo-img--loaded' : ''}`}
                     loading={priority ? 'eager' : 'lazy'}
-                    fetchpriority={priority ? 'high' : 'low'}
+                    fetchPriority={priority ? 'high' : 'low'}
                     decoding={priority ? 'sync' : 'async'}
                     onLoad={() => setLoaded(true)}
                 />

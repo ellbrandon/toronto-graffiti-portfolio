@@ -14,6 +14,7 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
     const [zoomed, setZoomed] = useState(false);
     const zoomedRef = useRef(false);
     const closeRef = useRef(null);
+    const zoomOverlayRef = useRef(null);
 
     // Keep ref in sync with state
     useEffect(() => { zoomedRef.current = zoomed; }, [zoomed]);
@@ -56,6 +57,7 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
     if (zoomed) {
         return (
             <div
+                ref={zoomOverlayRef}
                 className="modal-zoom-overlay"
                 role="dialog"
                 aria-modal="true"
@@ -75,6 +77,10 @@ const PhotoModal = ({ photo, onClose, photos = [], onNavigate, onSelectFilter })
                         src={photo.url}
                         alt={alt}
                         className="modal-zoom-photo"
+                        onLoad={() => {
+                            const el = zoomOverlayRef.current;
+                            if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+                        }}
                     />
                 </div>
             </div>
