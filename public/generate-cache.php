@@ -49,7 +49,8 @@ const WHAT_SINGULAR_TO_PLURAL = [
     'slap'         => 'Slaps',
     'can'          => 'Cans',
     'beef'         => 'Beefs',
-    'wallwisdom'   => 'Wall Wisdoms',
+    'wallwisdom'   => 'Wall Wisdoms', 
+    'inaction'     => 'inaction', 
 ];
 
 const WHERE_TAGS = [
@@ -58,7 +59,7 @@ const WHERE_TAGS = [
     'rooftop', 'subway', 'bando', 'urbex',
 ];
 
-const WHAT_EXCLUDED = ['nocturnal', 'nocturnals', 'stich', 'stiches', 'pano', 'panos'];
+const WHAT_EXCLUDED = ['nocturnal', 'nocturnals', 'stich', 'stiches', 'pano', 'panos', 'inaction' , 'inaction'];
 
 $whatDisplay = [];
 foreach (WHAT_SINGULAR_TO_PLURAL as $singular => $plural) {
