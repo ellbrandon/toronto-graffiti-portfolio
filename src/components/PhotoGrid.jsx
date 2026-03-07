@@ -51,11 +51,13 @@ const PhotoCard = ({ photo, onPhotoClick, colorMode, priority }) => {
 const PhotoGrid = ({ photos, onPhotoClick, colorMode, onClearFilters }) => {
     const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
     const prevVisibleCount = useRef(INITIAL_COUNT);
+    const prevPhotoSigRef = useRef('');
     const sentinelRef = useRef(null);
     const { gridRef, reinit, appendItems } = useLayout('.grid-item', '.grid-sizer');
-
-    // Reset and reinit masonry when the photo list changes (filter/sort)
     useEffect(() => {
+        const sig = `${photos.length}:${photos[0]?.id ?? ''}:${photos[photos.length - 1]?.id ?? ''}`;
+        if (sig === prevPhotoSigRef.current) return;
+        prevPhotoSigRef.current = sig;
         const scroller = document.querySelector('.main-content') ?? window;
         scroller.scrollTo({ top: 0, behavior: 'instant' });
         setVisibleCount(INITIAL_COUNT);
